@@ -1,13 +1,13 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "slate",
+  "productName": "Slate",
   "version": "0.1.0",
   "identifier": "dev.ctrl-neo",
   "build": {
-    "frontendDist": "../.output",
+    "frontendDist": "../dist",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": "pnpm run generate",
+    "beforeDevCommand": "pnpm run dev"
   },
   "app": {
     "windows": [
@@ -37,7 +37,22 @@
   },
   "bundle": {
     "active": true,
+    "longDescription": "",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "resources": [],
+    "shortDescription": "",
     "targets": "all",
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -51,8 +66,9 @@
           "sdf"
         ],
         "description": "The Slate Document Format.",
-        "name": "Slate Document Format",
-        "role": "Editor"
+        "name": "sdf",
+        "role": "Editor",
+        "mimeType": "text/sdf"
       }
     ]
   }
