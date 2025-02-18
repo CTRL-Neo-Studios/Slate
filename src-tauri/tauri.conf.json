@@ -16,7 +16,15 @@
         "width": 800,
         "height": 600,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "backgroundColor": null,
+        "transparent": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "windowEffects": {
+          "effects": ["blur", "underWindowBackground"],
+          "radius": 10
+        }
       }
     ],
     "security": {

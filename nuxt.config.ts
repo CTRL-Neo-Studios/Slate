@@ -20,8 +20,12 @@ export default defineNuxtConfig({
 
     modules: [
         '@nuxt/ui',
-        '@nuxt/eslint',
+        // '@nuxt/eslint',
+        'nuxt-tiptap-editor'
     ],
+    tiptap: {
+        prefix: 'Tiptap', //prefix for Tiptap imports, composables not included
+    },
 
     css: ['~/assets/css/main.css'],
 

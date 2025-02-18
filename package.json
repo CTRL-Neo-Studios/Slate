@@ -7,6 +7,7 @@
     "dev": "nuxt dev",
     "tauri:dev": "cd src-tauri && tauri dev",
     "tauri:build": "cd src-tauri && tauri build",
+    "tauri": "cd src-tauri && tauri",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -16,14 +17,24 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.26",
     "@iconify-json/simple-icons": "^1.2.24",
-    "@nuxt/ui": "3.0.0-alpha.12",
-    "nuxt": "^3.15.4"
+    "@nuxt/ui": "^3.0.0-alpha.13",
+    "@tauri-apps/api": "^2.2.0",
+    "@tiptap/extension-highlight": "^2.11.5",
+    "@tiptap/extension-link": "^2.11.5",
+    "@tiptap/extension-table": "^2.11.5",
+    "@tiptap/extension-table-cell": "^2.11.5",
+    "@tiptap/extension-table-header": "^2.11.5",
+    "@tiptap/extension-text-style": "^2.11.5",
+    "@tiptap/extension-underline": "^2.11.5",
+    "marked": "^15.0.7",
+    "nuxt": "^3.15.4",
+    "nuxt-tiptap-editor": "^2.1.4",
+    "shiki": "^2.4.2"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.0.1",
     "@tailwindcss/typography": "^0.5.16",
     "@tauri-apps/cli": "^2.2.7",
-    "eslint": "^9.20.1",
+    "@types/marked": "^6.0.0",
     "typescript": "^5.7.3"
   }
 }
