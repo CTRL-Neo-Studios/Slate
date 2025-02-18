@@ -20,11 +20,13 @@
 </script>
 
 <template>
-    <div data-tauri-drag-region class="bg-transparent h-7 z-40 select-none flex justify-end fixed top-0 left-0 right-0">
-        <!--            <UButton size="sm" icon="lucide:minus" @click="getCurrentWebviewWindow().minimize()"/>-->
-        <!--            <UButton size="sm" icon="lucide:app-window" @click="getCurrentWebviewWindow().toggleMaximize()"/>-->
-        <!--            <UButton size="sm" icon="lucide:x" @click="getCurrentWebviewWindow().close()"/>-->
-    </div>
+<!--    <Head>-->
+<!--        <div data-tauri-drag-region class="bg-transparent h-7 z-40 select-none flex justify-end fixed top-0 left-0 right-0">-->
+<!--            &lt;!&ndash;            <UButton size="sm" icon="lucide:minus" @click="getCurrentWebviewWindow().minimize()"/>&ndash;&gt;-->
+<!--            &lt;!&ndash;            <UButton size="sm" icon="lucide:app-window" @click="getCurrentWebviewWindow().toggleMaximize()"/>&ndash;&gt;-->
+<!--            &lt;!&ndash;            <UButton size="sm" icon="lucide:x" @click="getCurrentWebviewWindow().close()"/>&ndash;&gt;-->
+<!--        </div>-->
+<!--    </Head>-->
     <UApp>
         <NuxtPage />
     </UApp>

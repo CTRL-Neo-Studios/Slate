@@ -14,7 +14,8 @@ export const useFileState = () => {
     };
 
     const setSavedStatus = (value: boolean) => {
-        savingFile.value = !value;
+        if (value)
+            savingFile.value = !value;
         isSaved.value = value;
     }
 
@@ -30,10 +31,14 @@ export const useFileState = () => {
         return savingFile
     }
 
+    const setSavingFile = (value: boolean) => {
+        savingFile.value = value
+    }
+
     const getFileName = () => {
         let fp = (unref(getFilePath()) || "Untitled Note").split('/')
         return fp[fp.length - 1]
     }
 
-    return { getFilePath, isFileSaved, isSavingFile, setSavedStatus, setFilePath, resetFileState, getFileName };
+    return { getFilePath, isFileSaved, isSavingFile, setSavedStatus, setSavingFile, setFilePath, resetFileState, getFileName };
 };

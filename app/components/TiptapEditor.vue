@@ -116,17 +116,17 @@ function setStyle(value: string) {
     <div>
         <slot name="top-bar" :editor="editor"/>
         <div class="w-full fixed top-0 left-0 right-0 h-fit z-10">
-            <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default">
-                <div class="flex items-center justify-center p-1 px-2 gap-2 rounded-lg backdrop-blur-md">
-                    <div class="text-center text-sm">{{ $state.getFileName() }}</div>
-                    <Icon name="lucide:file-warning" class="size-3" v-if="$state.getFilePath().value == null || ''"/>
-                    <template v-else>
-                        <UTooltip :text="$state.isFileSaved().value ? 'File saved.' : $state.isSavingFile().value ? 'Saving file...' : 'File not saved.'">
-                            <Icon name="lucide:file-check" class="size-3" v-if="$state.isFileSaved().value"/>
-                            <Icon name="lucide:file-clock" class="size-3 animate-pulse animate" v-else-if="$state.isSavingFile().value"/>
-                            <Icon name="lucide:file-x" class="size-3 bg-error-500" v-else/>
-                        </UTooltip>
-                    </template>
+            <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default" data-tauri-drag-region>
+                <div class="flex items-center justify-center p-1 px-2 gap-2 rounded-lg backdrop-blur-md z-20" data-tauri-drag-region>
+                    <UTooltip class="z-20 text-sm" :delay-duration="500" :text="$state.isFileSaved().value ? 'File saved.' : $state.isSavingFile().value ? 'Saving file...' : 'File not saved.'">
+                        <div data-tauri-drag-region class="text-center text-sm">{{ $state.getFileName() }}</div>
+                        <Icon data-tauri-drag-region name="lucide:file-warning" class="size-3" v-if="$state.getFilePath().value == null || ''"/>
+                        <template v-else>
+                            <Icon data-tauri-drag-region name="lucide:file-check" class="size-3" v-if="$state.isFileSaved().value"/>
+                            <Icon data-tauri-drag-region name="lucide:file-clock" class="size-3 animate-pulse animate" v-else-if="$state.isSavingFile().value"/>
+                            <Icon data-tauri-drag-region name="lucide:file-x" class="size-3 bg-error-500" v-else/>
+                        </template>
+                    </UTooltip>
                 </div>
             </div>
         </div>

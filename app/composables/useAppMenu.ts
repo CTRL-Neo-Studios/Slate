@@ -88,7 +88,7 @@ export const useAppMenu = () => {
                     text: 'Export as Markdown',
                     action: async () => {
                         console.log('Export as Markdown');
-                        await $export.exportToMarkdown(editor.value?.getHTML(), null)
+                        await $export.exportToMarkdown(editor.value?.getText(), null)
                         // Add logic for exporting to Markdown
                     },
                 },

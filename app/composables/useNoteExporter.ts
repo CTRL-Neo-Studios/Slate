@@ -4,6 +4,7 @@ import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs'
 import htmlpdf, { type CreateOptions } from 'html-pdf'
 
 export function useNoteExporter() {
+    const $t = useToast()
     const exportToMarkdown = async (contentHtml: any, metaData: any) => {
         try {
             const turndownService = new TurndownService();
@@ -40,11 +41,10 @@ tags: ${metaData.tags ? metaData.tags.join(', ') : ''}
 
     const exportToPDF = async (contentHtml: any) => {
         try {
-
             // Generate PDF from HTML
             const pdfOptions: CreateOptions = { format: 'A4' }; // Customize PDF options
             const pdfBuffer = await new Promise((resolve, reject) => {
-                htmlpdf.create(contentHtml, pdfOptions).toBuffer((err, buffer) => {
+                htmlpdf.create(contentHtml).toBuffer((err, buffer) => {
                     if (err) reject(err);
                     else resolve(buffer);
                 });
