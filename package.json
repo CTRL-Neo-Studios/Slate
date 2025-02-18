@@ -19,6 +19,10 @@
     "@iconify-json/simple-icons": "^1.2.24",
     "@nuxt/ui": "^3.0.0-alpha.13",
     "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "@tauri-apps/plugin-fs": "^2.2.0",
+    "@tauri-apps/plugin-global-shortcut": "^2.2.0",
+    "@tauri-apps/plugin-process": "^2.2.0",
     "@tiptap/extension-highlight": "^2.11.5",
     "@tiptap/extension-link": "^2.11.5",
     "@tiptap/extension-table": "^2.11.5",
@@ -26,15 +30,19 @@
     "@tiptap/extension-table-header": "^2.11.5",
     "@tiptap/extension-text-style": "^2.11.5",
     "@tiptap/extension-underline": "^2.11.5",
+    "html-pdf": "^3.0.1",
     "marked": "^15.0.7",
     "nuxt": "^3.15.4",
     "nuxt-tiptap-editor": "^2.1.4",
-    "shiki": "^2.4.2"
+    "shiki": "^2.4.2",
+    "turndown": "^7.2.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "@tauri-apps/cli": "^2.2.7",
+    "@types/html-pdf": "^3.0.3",
     "@types/marked": "^6.0.0",
+    "@types/turndown": "^5.0.5",
     "typescript": "^5.7.3"
   }
 }

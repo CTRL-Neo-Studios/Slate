@@ -9,6 +9,20 @@
     "core:default",
     "core:window:default",
     "core:window:allow-start-dragging",
-    "os:default"
+    "os:default",
+    "dialog:default",
+    "fs:default",
+    "fs:read-files",
+    "fs:read-all",
+    "fs:write-files",
+    "fs:write-all",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/*" }]
+    },
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "process:default"
   ]
 }

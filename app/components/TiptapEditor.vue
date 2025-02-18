@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Underline } from '@tiptap/extension-underline'
-import { Highlight } from '@tiptap/extension-highlight'
+
+onMounted(() => {
+    $appMenu.init(editor)
+})
 
 const props = defineProps({
     showBottomBar: {
@@ -9,10 +11,18 @@ const props = defineProps({
     }
 })
 
-const editor = useEditor({
-    content: "<p></p>",
-    extensions: [TiptapStarterKit, TiptapLink, Highlight, Underline],
-});
+const $appMenu = useAppMenu()
+const $save = useNoteSaver()
+const $state = useFileState()
+
+const editor = useSlateEditor(() => {
+    $state.setSavedStatus(false);
+    // This callback is called once the content inside the editor is updated
+    if ($state.getFilePath().value != null) {
+
+        $save.autoSave(editor)
+    }
+})
 
 onBeforeUnmount(() => {
     unref(editor)?.destroy();
@@ -99,35 +109,54 @@ function setStyle(value: string) {
             break;
     }
 }
+
 </script>
 
 <template>
     <div>
-        <slot name="toolbar" :editor="editor"/>
-        <TiptapEditorContent :editor="editor" class="max-w-none w-full h-full" />
-        <template v-if="props.showBottomBar">
-            <div class="w-full absolute bottom-0 left-0 right-0 h-fit z-10">
-                <div class="w-full flex items-center justify-start p-2 gap-1">
-                    <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
-                             :disabled="!editor?.can().chain().focus().toggleBold().run()"
-                             @click="editor?.chain().focus().toggleBold().run()"/>
-                    <UButton icon="lucide:italic" size="xs" :variant="italicToggled"
-                             :disabled="!editor?.can().chain().focus().toggleItalic().run()"
-                             @click="editor?.chain().focus().toggleItalic().run()"/>
-                    <UButton icon="lucide:strikethrough" size="xs" :variant="strikeToggled"
-                             :disabled="!editor?.can().chain().focus().toggleStrike().run()"
-                             @click="editor?.chain().focus().toggleStrike().run()"/>
-                    <UButton icon="lucide:underline" size="xs" :variant="underlinedToggled"
-                             :disabled="!editor?.can().chain().focus().toggleUnderline().run()"
-                             @click="editor?.chain().focus().toggleUnderline().run()"/>
-                    <UButton icon="lucide:code" size="xs" :variant="codeToggled"
-                             :disabled="!editor?.can().chain().focus().toggleCode().run()"
-                             @click="editor?.chain().focus().toggleCode().run()"/>
-                    <USelect v-model="currentTextStyle" size="xs" :items="textStylesSelect"
-                             :disabled="!editor?.can().chain().focus().toggleHeading({level: 1}).run()"
-                             @update:model-value="setStyle" />
+        <slot name="top-bar" :editor="editor"/>
+        <div class="w-full fixed top-0 left-0 right-0 h-fit z-10">
+            <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default">
+                <div class="flex items-center justify-center p-1 px-2 gap-2 rounded-lg backdrop-blur-md">
+                    <div class="text-center text-sm">{{ $state.getFileName() }}</div>
+                    <Icon name="lucide:file-warning" class="size-3" v-if="$state.getFilePath().value == null || ''"/>
+                    <template v-else>
+                        <UTooltip :text="$state.isFileSaved().value ? 'File saved.' : $state.isSavingFile().value ? 'Saving file...' : 'File not saved.'">
+                            <Icon name="lucide:file-check" class="size-3" v-if="$state.isFileSaved().value"/>
+                            <Icon name="lucide:file-clock" class="size-3 animate-pulse animate" v-else-if="$state.isSavingFile().value"/>
+                            <Icon name="lucide:file-x" class="size-3 bg-error-500" v-else/>
+                        </UTooltip>
+                    </template>
                 </div>
             </div>
+        </div>
+        <TiptapEditorContent :editor="editor" class="max-w-none w-full h-full" />
+        <template v-if="props.showBottomBar">
+            <div class="w-full fixed bottom-0 left-0 right-0 h-fit z-10">
+                <div class="w-full flex items-center justify-start p-1 gap-1 select-none">
+                    <div class="w-fit flex items-center justify-start rounded-lg backdrop-blur-md p-1 gap-1 select-none">
+                        <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
+                                 :disabled="!editor?.can().chain().focus().toggleBold().run()"
+                                 @click="editor?.chain().focus().toggleBold().run()"/>
+                        <UButton icon="lucide:italic" size="xs" :variant="italicToggled"
+                                 :disabled="!editor?.can().chain().focus().toggleItalic().run()"
+                                 @click="editor?.chain().focus().toggleItalic().run()"/>
+                        <UButton icon="lucide:strikethrough" size="xs" :variant="strikeToggled"
+                                 :disabled="!editor?.can().chain().focus().toggleStrike().run()"
+                                 @click="editor?.chain().focus().toggleStrike().run()"/>
+                        <UButton icon="lucide:underline" size="xs" :variant="underlinedToggled"
+                                 :disabled="!editor?.can().chain().focus().toggleUnderline().run()"
+                                 @click="editor?.chain().focus().toggleUnderline().run()"/>
+                        <UButton icon="lucide:code" size="xs" :variant="codeToggled"
+                                 :disabled="!editor?.can().chain().focus().toggleCode().run()"
+                                 @click="editor?.chain().focus().toggleCode().run()"/>
+                        <USelect v-model="currentTextStyle" size="xs" :items="textStylesSelect"
+                                 :disabled="!editor?.can().chain().focus().toggleHeading({level: 1}).run()"
+                                 @update:model-value="setStyle" />
+                    </div>
+                </div>
+            </div>
+            <slot name="bottom-bar"/>
         </template>
     </div>
 </template>
@@ -136,7 +165,7 @@ function setStyle(value: string) {
 @reference "../assets/css/main.css";
 
 .tiptap {
-    @apply h-full min-h-max w-full max-w-none px-10 pt-8 pb-40 prose-sm prose prose-neutral dark:prose-invert;
+    @apply h-full min-h-max w-full max-w-none px-10 pt-16 pb-40 prose-sm prose prose-neutral dark:prose-invert;
 
     a {
         @apply cursor-pointer underline;
