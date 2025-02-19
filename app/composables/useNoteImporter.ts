@@ -10,42 +10,43 @@ export const useNoteImporter = () => {
     const $t = useToast()
     const $m = useModal()
 
-    const importNote = async () => {
-        const confirmImport = async () => {
-            const fallbackFilePath = unref($slate.getFilePath())
+    const confirmImport = async () => {
+        const fallbackFilePath = unref($slate.getFilePath())
 
-            try {
-                const selectedFile = await open({
-                    filters: [{
-                        name: 'Slate Document Format',
-                        extensions: ['sdf', 'md', 'txt'],
-                    }],
-                });
+        try {
+            const selectedFile = await open({
+                filters: [{
+                    name: 'Slate Document Format',
+                    extensions: ['sdf', 'md', 'txt'],
+                }],
+            });
 
-                await importFile(selectedFile)
+            await importFile(selectedFile)
 
+            if (selectedFile)
                 $t.add({
                     title: `Opened Note ${$slate.getFileName()}`,
                     description: `Opened from directory ${selectedFile}`,
                     color: 'success'
                 });
-            } catch (error) {
-                $t.add({
-                    title: `Error`,
-                    description: `Error occurred while opening note: ${error}`,
-                    color: 'error'
-                });
-                if (fallbackFilePath) {
-                    await importFile(fallbackFilePath)
-                } else {
-                    $slate.createSlateDocument()
-                }
-                console.error('Error importing note:', error);
-            } finally {
-                await $m.close()
+        } catch (error) {
+            $t.add({
+                title: `Error`,
+                description: `Error occurred while opening note: ${error}`,
+                color: 'error'
+            });
+            if (fallbackFilePath) {
+                await importFile(fallbackFilePath)
+            } else {
+                $slate.createSlateDocument()
             }
+            console.error('Error importing note:', error);
+        } finally {
+            await $m.close()
         }
+    }
 
+    const importNote = async () => {
         if ($slate.getFilePath().value != null && !$slate.isFileSaved().value){
             $m.open(SlateModalWarning, {
                 title: 'Importing Note',
@@ -75,7 +76,7 @@ export const useNoteImporter = () => {
             $t.add({
                 title: 'Unable to Import Note',
                 description: 'Unsupported extension for editing in slate.',
-                icon: 'lucide:error',
+                icon: 'lucide:circle-x',
                 color: 'error'
             })
             await $m.close()
@@ -87,15 +88,21 @@ export const useNoteImporter = () => {
         const fileRawContent = await readFile(path);
         let decoder = new TextDecoder()
         const fileContent = decoder.decode(fileRawContent)
-        const noteData: SlateDocument = JSON.parse(fileContent);
+        const rawData = JSON.parse(fileContent);
+        const noteData: SlateDocument = {
+            metaData: rawData.metaData,
+            pages: rawData.pages
+        }
+
+        console.log(noteData as SlateDocument)
 
         // Update the file state
         $slate.setFilePath(path);
         $slate.setSavedStatus(true);
 
-        $slate.setSlateDocument(noteData)
+        $slate.setSlateDocument(noteData as SlateDocument)
         if (routePage)
-            navigateTo(`/document/${noteData.pages[0]?.uuid}`)
+            await navigateTo(`/document/${noteData.pages[0]?.uuid}`)
     }
 
     const readMarkdown = async (path: string) => {

@@ -1,5 +1,5 @@
 import { save } from '@tauri-apps/plugin-dialog';
-import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs';
+import { writeTextFile, writeFile, create } from '@tauri-apps/plugin-fs';
 import type { Editor } from '@tiptap/vue-3'
 import { SlateModalWarning } from '#components'
 import { exit, relaunch } from '@tauri-apps/plugin-process';
@@ -19,7 +19,7 @@ export const useNoteSaver = () => {
             let targetPath = unref($slate.getFilePath());
 
             // If the file is not saved, show the save dialog
-            if (!unref($slate.isFileSaved()) && targetPath == null) {
+            if ((!unref($slate.isFileSaved()) && targetPath == null) || !targetPath?.endsWith(".sdf")) {
                 targetPath = await save({
                     filters: [{
                         name: 'Slate Document Format',
@@ -41,14 +41,9 @@ export const useNoteSaver = () => {
                 if(autoSaveTimeout)
                     clearTimeout(autoSaveTimeout)
 
-                if (!targetPath.endsWith(".sdf")){
-                    targetPath += ".sdf"
-                    $slate.getFilePath().value += ".sdf"
-                }
-
                 let encoder = new TextEncoder()
                 let data = encoder.encode(jsonString)
-                if(!targetPath.endsWith('.sdf')) targetPath += '.sdf'
+
                 await writeFile(targetPath, data);
                 if (notifyOutput)
                     $t.add({
@@ -59,10 +54,13 @@ export const useNoteSaver = () => {
                 console.log('Note saved successfully:', targetPath);
             }
         } catch (error) {
+            $slate.setSavedStatus(false)
+            $slate.setSavingFile(false)
             $t.add({
                 title: 'Saving Note',
                 description: `Error occurred while saving note: ${error}`,
                 color: 'error',
+                icon: 'lucide:circle-x'
             });
         }
     };

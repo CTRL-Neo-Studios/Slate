@@ -16,6 +16,8 @@
     "fs:read-all",
     "fs:write-files",
     "fs:write-all",
+    "fs:allow-create",
+    "fs:create-app-specific-dirs",
     {
       "identifier": "fs:allow-exists",
       "allow": [{ "path": "$APPDATA/*" }]

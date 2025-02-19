@@ -1,7 +1,30 @@
 <script setup lang="ts">
+const $slate = useSlateFile()
+const $import = useNoteImporter()
+
+function createDoc() {
+    $slate.createSlateDocument()
+}
+
+function openDoc() {
+    $import.importNote()
+}
 </script>
 <template>
-    <div class="w-full min-h-screen flex justify-center items-start">
-        <TiptapEditor class="h-full sm:w-xl md:w-2xl w-3xl lg:w-4xl xl:w-5xl" show-bottom-bar/>
+    <div>
+        <div class="w-full min-h-screen flex flex-col items-center justify-center prose max-w-none dark:prose-invert">
+            <h1 class="mb-0">Welcome to Slate👋</h1>
+            <p>We hope you enjoy the ride 😊~</p>
+            <div class="grid-cols-2 gap-4 grid">
+                <UButton class="text-center flex-col size-24 justify-center items-center" variant="subtle" @click="createDoc()">
+                    <Icon name="lucide:plus" class="size-8"/>
+                    <div>New Doc</div>
+                </UButton>
+                <UButton class="text-center flex-col size-24 justify-center items-center" variant="subtle" @click="openDoc()">
+                    <Icon name="lucide:file" class="size-8"/>
+                    <div>Open...</div>
+                </UButton>
+            </div>
+        </div>
     </div>
 </template>

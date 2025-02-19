@@ -31,7 +31,7 @@ export function useNoteExporter() {
                 title: 'An error occurred while exporting document to markdown.',
                 description: `${error}`,
                 color: 'error',
-                icon: 'lucide:error'
+                icon: 'lucide:circle-x'
             })
             console.error('Error exporting to Markdown:', error);
         }
@@ -65,7 +65,7 @@ export function useNoteExporter() {
                 title: 'An error occurred while exporting document to markdown.',
                 description: `${error}`,
                 color: 'error',
-                icon: 'lucide:error'
+                icon: 'lucide:circle-x'
             })
             console.error('Error exporting to Markdown:', error);
         }

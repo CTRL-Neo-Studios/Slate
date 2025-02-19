@@ -7,16 +7,20 @@ import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { SearchAndReplace } from '@sereneinserenade/tiptap-search-and-replace'
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
+import AutoJoiner from 'tiptap-extension-auto-joiner'
 import { TaskList } from '@tiptap/extension-task-list'
 import { TaskItem } from '@tiptap/extension-task-item'
 import type { Editor } from '@tiptap/vue-3'
 import type { ShallowRef } from '@vue/reactivity'
+import { Typography } from '@tiptap/extension-typography'
+import { StarterKit } from '@tiptap/starter-kit'
 
-export const useSlateEditor = (onUpdateCallback: any, ...extensions: any[]) => {
+export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any, ...extensions: any[]) => {
     return useEditor({
-        content: "<p></p>",
+        content: initialContent,
+        editable,
         extensions: [
-            TiptapStarterKit,
+            StarterKit,
             TiptapLink,
             Highlight,
             Underline,
@@ -25,8 +29,10 @@ export const useSlateEditor = (onUpdateCallback: any, ...extensions: any[]) => {
             TableRow,
             TableHeader,
             TableCell,
+            Typography,
             SearchAndReplace,
             GlobalDragHandle,
+            AutoJoiner,
             // TaskList,
             // TaskItem.configure({
             //     HTMLAttributes: {
