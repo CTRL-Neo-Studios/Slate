@@ -255,12 +255,10 @@ div[contenteditable='true']:focus {
     cursor: grab;
 
     &:hover {
-        background-color: var(--novel-stone-100);
         transition: background-color 0.2s;
     }
 
     &:active {
-        background-color: var(--novel-stone-200);
         transition: background-color 0.2s;
         cursor: grabbing;
     }
