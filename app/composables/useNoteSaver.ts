@@ -1,33 +1,25 @@
 import { save } from '@tauri-apps/plugin-dialog';
-import { writeTextFile } from '@tauri-apps/plugin-fs';
+import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs';
 import type { Editor } from '@tiptap/vue-3'
 import { SlateModalWarning } from '#components'
 import { exit, relaunch } from '@tauri-apps/plugin-process';
+import type { SlateDocument } from '~/slate.types'
 
 export const useNoteSaver = () => {
-    const { getFilePath, setSavedStatus, isFileSaved, setFilePath, resetFileState } = useFileState();
+    const $slate = useSlateFile();
     const $t = useToast();
     const $m = useModal()
 
     let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
 
-    const saveNote = async (editor: Ref<Editor | undefined>, notifyOutput: boolean = false) => {
+    const saveNote = async (notifyOutput: boolean = false) => {
         try {
-            let metaData = {}, embeddedImages: any[] = [], persistentData = {}, textType = "html"
-            // Construct the custom file format (JSON)
-            const noteData = {
-                metaData,
-                content: editor.value?.getHTML(),
-                embeddedImages,
-                persistentData,
-                textType
-            };
-            const jsonString = JSON.stringify(noteData, null, 2);
+            const jsonString = JSON.stringify(unref($slate.getCurrentSlateDoc()), null, 2);
 
-            let targetPath = unref(getFilePath());
+            let targetPath = unref($slate.getFilePath());
 
             // If the file is not saved, show the save dialog
-            if (!unref(isFileSaved()) && getFilePath().value == null) {
+            if (!unref($slate.isFileSaved()) && targetPath == null) {
                 targetPath = await save({
                     filters: [{
                         name: 'Slate Document Format',
@@ -41,7 +33,7 @@ export const useNoteSaver = () => {
                 }
 
                 // Update the file state
-                setFilePath(targetPath);
+                $slate.setFilePath(targetPath);
             }
 
             // Save the file
@@ -49,13 +41,21 @@ export const useNoteSaver = () => {
                 if(autoSaveTimeout)
                     clearTimeout(autoSaveTimeout)
 
-                await writeTextFile(targetPath, jsonString);
+                if (!targetPath.endsWith(".sdf")){
+                    targetPath += ".sdf"
+                    $slate.getFilePath().value += ".sdf"
+                }
+
+                let encoder = new TextEncoder()
+                let data = encoder.encode(jsonString)
+                if(!targetPath.endsWith('.sdf')) targetPath += '.sdf'
+                await writeFile(targetPath, data);
                 if (notifyOutput)
                     $t.add({
                         title: 'Note Saved.',
                         color: 'success',
                     });
-                setSavedStatus(true)
+                $slate.setSavedStatus(true)
                 console.log('Note saved successfully:', targetPath);
             }
         } catch (error) {
@@ -67,7 +67,7 @@ export const useNoteSaver = () => {
         }
     };
 
-    const autoSave = (editor: Ref<Editor | undefined>) => {
+    const autoSave = () => {
         // Clear the previous timeout if it exists
         if (autoSaveTimeout) {
             clearTimeout(autoSaveTimeout);
@@ -76,12 +76,12 @@ export const useNoteSaver = () => {
         // Set a new timeout for auto-saving
         autoSaveTimeout = setTimeout(async () => {
             console.log('Auto-saving note...');
-            await saveNote(editor); // Call the saveNote function
+            await saveNote(); // Call the saveNote function
         }, 5000); // 5 seconds delay
     };
 
     const saveBeforeQuit = () => {
-        if (!isFileSaved().value) {
+        if (!$slate.isFileSaved().value) {
             $m.open(SlateModalWarning, {
                 title: 'Quitting Slate',
                 description: 'Your current note is unsaved! Are you sure you want to quit right now without saving?',
@@ -102,5 +102,5 @@ export const useNoteSaver = () => {
         }
     }
 
-    return { saveNote, autoSave, saveBeforeQuit, resetFileState };
+    return { saveNote, autoSave, saveBeforeQuit };
 };

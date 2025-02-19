@@ -6,6 +6,7 @@ export const useAppMenu = () => {
     const $import = useNoteImporter()
     const $saver = useNoteSaver()
     const $export = useNoteExporter()
+    const $slate = useSlateFile()
 
 
     const init = async (editor: Ref<Editor | undefined>) => {
@@ -62,6 +63,7 @@ export const useAppMenu = () => {
                     accelerator: 'CommandOrControl+N',
                     action: async () => {
                         console.log('New File');
+                        $slate.createSlateDocument()
                     },
                 },
                 {
@@ -70,7 +72,7 @@ export const useAppMenu = () => {
                     accelerator: 'CommandOrControl+O',
                     action: async () => {
                         console.log('Open File');
-                        await $import.importNote(editor)
+                        await $import.importNote()
                     },
                 },
                 {
@@ -79,7 +81,7 @@ export const useAppMenu = () => {
                     accelerator: 'CommandOrControl+S',
                     action: async () => {
                         console.log('Save File');
-                        await $saver.saveNote(editor)
+                        await $saver.saveNote()
                     },
                 },
                 separator,
@@ -88,7 +90,7 @@ export const useAppMenu = () => {
                     text: 'Export as Markdown',
                     action: async () => {
                         console.log('Export as Markdown');
-                        await $export.exportToMarkdown(editor.value?.getText(), null)
+                        await $export.exportToMarkdown(editor)
                         // Add logic for exporting to Markdown
                     },
                 },
@@ -97,7 +99,7 @@ export const useAppMenu = () => {
                     text: 'Export as PDF',
                     action: async () => {
                         console.log('Export as PDF');
-                        await $export.exportToPDF(editor.value?.getHTML())
+                        await $export.exportToPDF(editor)
                         // Add logic for exporting to PDF
                     },
                 },
