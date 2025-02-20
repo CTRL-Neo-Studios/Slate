@@ -8,13 +8,7 @@ export const defaultSlateDocument = (pageUUID: string): SlateDocument => {
             savesOnCloud: false
         },
         pages: [
-            {
-                content: '<p></p>',
-                embeddedImages: [],
-                persistentData: null,
-                textType: 'html',
-                uuid: pageUUID
-            }
+            defaultSlatePage(pageUUID)
         ]
     }
 }
@@ -29,7 +23,10 @@ export const defaultSlatePage = (pageUUID: string): SlatePage => {
         embeddedImages: [],
         persistentData: null,
         textType: 'html',
-        uuid: pageUUID
+        uuid: pageUUID,
+        icon: 'lucide:file',
+        name: 'Page',
+        children: []
     }
 }
 

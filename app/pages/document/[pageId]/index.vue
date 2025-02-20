@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SlateModalDocumentInformation } from '#components'
+import { SlateModalDocumentInformation, SlateSlideoverPagesTree } from '#components'
 
 onMounted(() => {
     $appMenu.init($editor)
@@ -16,16 +16,62 @@ const $route = useRoute()
 const $appMenu = useAppMenu()
 const $save = useNoteSaver()
 const $slate = useSlateFile()
-const $m = useModal(), $t = useToast()
+const $m = useModal(), $t = useToast(), $s = useSlideover()
+
+const filePageDirs = ref([] as any[])
+const breadcrumbs = computed(() => {
+    let arr = $slate.getCurrentNestedPageDirsPerformant($pageId).map((i: any) => {
+        return {
+            slot: 'page',
+            label: i.name,
+            icon: i.icon,
+            to: `/document/${i.uuid}`,
+        }
+    })
+    if (arr.length > 1){
+        let concat = {
+            slot: 'dropdown',
+            icon: 'lucide:ellipsis',
+            label: '',
+            children: [
+                ...arr.slice(0, arr.length-1)
+            ]
+        }
+        return [
+            {
+                icon: '',
+                slot: 'document',
+                label: $slate.getFileName(),
+            },
+            concat,
+            arr[arr.length-1],
+        ]
+    }
+
+    return [
+        {
+            icon: '',
+            slot: 'document',
+            label: $slate.getFileName(),
+        },
+        ...arr,
+    ]
+})
 
 const $pageId = computed(() => $route.params.pageId as string || '')
 
+watch($pageId, (newId, oldId) => {
+    $slate.setSlatePageContent(oldId, $editor.value?.getHTML() || '<p></p>')
+    $save.saveNote()
+    $editor.value?.commands.setContent($slate.getCurrentSlatePage(newId)?.content || '')
+})
+
 const $editor = useSlateEditor($slate.getCurrentSlatePage($pageId)?.content || '', true, () => {
-    $slate.setSlatePageContent($pageId, $editor.value?.getHTML() || '<p></p>')
     $slate.setSavedStatus(false);
     $slate.setSavingFile(true);
     // This callback is called once the content inside the editor is updated
     if ($slate.getFilePath().value != null) {
+        $slate.setSlatePageContent($pageId, $editor.value?.getHTML() || '<p></p>')
         $save.autoSave()
     }
 })
@@ -127,17 +173,30 @@ function documentInformation() {
             <div class="h-full sm:w-xl md:w-2xl w-3xl lg:w-4xl xl:w-5xl">
                 <div class="w-full fixed top-0 left-0 right-0 h-fit z-10">
                     <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default" data-tauri-drag-region>
-                        <div class="flex items-center justify-center p-1 px-2 gap-2 rounded-lg backdrop-blur-md z-20" data-tauri-drag-region>
-                            <UTooltip class="z-20 text-sm" :delay-duration="500" :text="!$slate.isFileSaved().value ? 'File not saved.' : $slate.isSavingFile().value ? 'Saving file...' : 'File saved.'">
-                                <div data-tauri-drag-region class="text-center text-sm text-primary">{{ $slate.getFileName()
-                                    }}</div>
-                                <Icon data-tauri-drag-region name="lucide:file-warning" class="size-3" v-if="$slate.getFilePath().value == null || ''"/>
-                                <template v-else>
-                                    <Icon data-tauri-drag-region name="lucide:file-clock" class="size-3 animate-pulse animate" v-if="$slate.isSavingFile().value"/>
-                                    <Icon data-tauri-drag-region name="lucide:file-check" class="size-3" v-else-if="$slate.isFileSaved().value"/>
-                                    <Icon data-tauri-drag-region name="lucide:file-x" class="size-3 bg-error-500" v-else/>
+                        <div class="flex items-center justify-center p-1 px-2 gap-2 rounded-lg backdrop-blur-md z-20 w-fit" data-tauri-drag-region>
+                            <!--Ignore The Error Here... fucking typescript-->
+                            <UBreadcrumb :items="breadcrumbs" class="text-sm select-none gap-1" data-tauri-drag-region>
+                                <template #document="{item}" data-tauri-drag-region>
+                                    <div data-tauri-drag-region class="px-1">{{item.label}}</div>
                                 </template>
-                            </UTooltip>
+                                <template #page="{item}" data-tauri-drag-region>
+                                    <UButton data-tauri-drag-region class="px-1" :icon="item?.icon || 'lucide:file'" size="sm" :label="item?.label || 'Untitled Page'" variant="link" />
+                                </template>
+                                <template #dropdown="{item}" data-tauri-drag-region>
+                                    <UDropdownMenu :items="(item as any).children || []">
+                                        <UButton data-tauri-drag-region class="px-1" :icon="item.icon" size="sm" variant="link" />
+                                    </UDropdownMenu>
+                                </template>
+                                <template #separator data-tauri-drag-region>
+                                    <div class="text-(--ui-text-muted)" data-tauri-drag-region>/</div>
+                                </template>
+                            </UBreadcrumb>
+                            <Icon data-tauri-drag-region name="lucide:file-warning" class="size-3" v-if="$slate.getFilePath().value == null || ''"/>
+                            <template v-else>
+                                <Icon data-tauri-drag-region name="lucide:file-clock" class="size-3 animate-pulse animate" v-if="$slate.isSavingFile().value"/>
+                                <Icon data-tauri-drag-region name="lucide:file-check" class="size-3" v-else-if="$slate.isFileSaved().value"/>
+                                <Icon data-tauri-drag-region name="lucide:file-x" class="size-3 bg-error-500" v-else/>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -193,6 +252,12 @@ function documentInformation() {
                                         })
                                     }"/>
                                 </UTooltip>
+                                <UButton icon="lucide:menu" size="xs" variant="ghost" @click="() => {
+                                        $s.open(SlateSlideoverPagesTree, {
+                                            pages: $slate.getCurrentSlateDoc().value?.pages,
+                                            currentPage: $pageId
+                                        })
+                                    }"/>
                             </div>
                         </div>
                     </div>

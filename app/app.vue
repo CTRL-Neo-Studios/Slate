@@ -27,7 +27,7 @@
 <!--            &lt;!&ndash;            <UButton size="sm" icon="lucide:x" @click="getCurrentWebviewWindow().close()"/>&ndash;&gt;-->
 <!--        </div>-->
 <!--    </Head>-->
-    <NuxtLoadingIndicator/>
+    <NuxtLoadingIndicator color="gray"/>
     <UApp>
         <NuxtPage />
     </UApp>

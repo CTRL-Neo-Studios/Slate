@@ -79,7 +79,7 @@ export const useNoteSaver = () => {
     };
 
     const saveBeforeQuit = () => {
-        if (!$slate.isFileSaved().value) {
+        if (!$slate.isFileSaved().value || !unref($slate.getFilePath())) {
             $m.open(SlateModalWarning, {
                 title: 'Quitting Slate',
                 description: 'Your current note is unsaved! Are you sure you want to quit right now without saving?',

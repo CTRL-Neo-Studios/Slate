@@ -9,6 +9,9 @@ export type SlatePage = {
     embeddedImages: any[],
     persistentData: any,
     textType: 'html' | 'markdown' | 'json'
+    children: SlatePage[],
+    name: string,
+    icon: string,
 }
 
 export type SlateMetadata = {
