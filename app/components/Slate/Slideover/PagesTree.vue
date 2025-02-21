@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { TreeItem, TreeRoot, TreeVirtualizer } from 'reka-ui'
 import type { SlatePage } from '~/slate.types'
-import { SlateModalPageRename } from '#components'
+import { SlateModalPageRename, SlateModalSelectIcon, SlateModalWarning } from '#components'
 
 const props = defineProps<{pages: SlatePage[], currentPage: string}>()
 
 const $slate = useSlateFile()
+const $slateCommon = useSlateCommon()
 const slideover = useSlideover()
 
 // Track expanded state
 const expandedItems = ref<string[]>([])
 const modal = useModal()
+const $t = useToast()
 
 onMounted(() => {
     const path = $slate.getCurrentNestedPageDirs(props.currentPage)
@@ -18,26 +20,23 @@ onMounted(() => {
 })
 
 const handleRename = (uuid: string, currentName: string) => {
+    $slateCommon.renamePage(uuid, currentName)
     slideover.close()
-    modal.open(SlateModalPageRename, {
-        onConfirm(newName: string) {
-            if (currentName.trim()) {
-                $slate.renamePage(uuid, {
-                    type: 'rename',
-                    value: '.*', // Replace entire name
-                    replaceValue: newName.trim()
-                })
-            }
-            modal.close()
-        }
-    })
 }
 
-const handleDelete = (uuid: string, hasChildren: boolean) => {
-    // Optional: Add confirmation dialog
-    if (confirm(`Are you sure you want to delete this page${hasChildren ? ' and its children' : ''}?`)) {
-        $slate.deletePage(uuid, true) // true for recursive deletion
-    }
+const handleDelete = (uuid: string, recursive: boolean) => {
+    $slateCommon.deletePage(uuid, recursive)
+    slideover.close()
+}
+
+const handleCreatePage = async (mode: 'root' | 'current' | 'under', targetPageUUID: string) => {
+    await $slateCommon.createPage(mode, targetPageUUID)
+    await slideover.close()
+}
+
+const handleChangeIcon = (uuid: string) => {
+    $slateCommon.changeIcon(uuid)
+    slideover.close()
 }
 </script>
 
@@ -45,8 +44,29 @@ const handleDelete = (uuid: string, hasChildren: boolean) => {
     <USlideover title="Document Pages" description="All of the pages in this Slate Document.">
         <template #body>
             <div class="flex items-center justify-start gap-1 mb-2">
-                <UButton icon="lucide:file-plus" variant="soft" size="sm" @click="$slate.createSlatePage(useUUID())" label="New Page"/>
-                <UButton icon="lucide:file-plus" variant="soft" size="sm" @click="$slate.createSlatePage(useUUID(), currentPage)" label="New Nested Page"/>
+                <UDropdownMenu :items="[
+                    {
+                        label: 'In Document',
+                        onSelect() {
+                            handleCreatePage('root', currentPage)
+                        }
+                    },
+                    {
+                        label: 'At Same Level',
+                        disabled: $slate.getPageParent(currentPage)?.uuid == null,
+                        onSelect() {
+                            handleCreatePage('current', currentPage)
+                        }
+                    },
+                    {
+                        label: 'Under Current Page',
+                        onSelect() {
+                            handleCreatePage('under', currentPage)
+                        }
+                    },
+                ]">
+                    <UButton icon="lucide:file-plus" variant="soft" size="sm" label="New Page..."/>
+                </UDropdownMenu>
             </div>
             <USeparator class="mb-2"/>
             <TreeRoot
@@ -69,21 +89,34 @@ const handleDelete = (uuid: string, hasChildren: boolean) => {
                         [
                           {
                             label: 'Rename',
-                            icon: 'lucide:edit-2',
-                            onSelect: () => handleRename(item.value.uuid, item.value.name)
+                            icon: 'lucide:pen-line',
+                            onSelect: () => {
+                                handleRename(item.value.uuid, item.value.name)
+                            }
+                          },
+                          {
+                            label: 'Change Icon',
+                            icon: 'lucide:pen-line',
+                            onSelect: () => {
+                                handleChangeIcon(item.value.uuid)
+                            }
                           },
                           {
                             label: 'Delete',
                             icon: 'lucide:trash-2',
                             color: 'error',
-                            onSelect: () => handleDelete(item.value.uuid, (item.value.children?.length || 0) > 0)
+                            onSelect: () => {
+                                handleDelete(item.value.uuid, true)
+                            }
                           }
                         ],
                         [
                           {
                             label: 'New Child Page',
                             icon: 'lucide:file-plus',
-                            onSelect: () => $slate.createSlatePage(useUUID(), item.value.uuid)
+                            onSelect: () => {
+                                handleCreatePage('under', item.value.uuid)
+                            }
                           }
                         ]
                       ]">
@@ -94,9 +127,9 @@ const handleDelete = (uuid: string, hasChildren: boolean) => {
                             :label="item.value.name"
                             size="sm"
                             @click="() => {
-                            navigateTo(`/document/${item.value.uuid}`)
-                            slideover.close()
-                        }"
+                                navigateTo(`/document/${item.value.uuid}`)
+                                slideover.close()
+                            }"
                         />
                         <template v-if="(item.value.children?.length || 0) > 0">
                             <UButton

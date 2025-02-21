@@ -76,16 +76,18 @@ export const useSlateFile = () => {
         const page = pageMap.value.get(unref(pageUUID))
         if (!page) return
 
-        Object.assign(page, {
-            content: data.content ?? page.content ?? '<p></p>',
-            embeddedImages: data.embeddedImages ?? page.embeddedImages ?? [],
-            persistentData: data.persistentData ?? page.persistentData ?? null,
-            textType: data.textType ?? page.textType ?? 'html',
-            children: data.children ?? page.children ?? [],
-            name: data.name ?? page.name ?? 'Untitled Page',
-            icon: data.icon ?? page.icon ?? 'lucide:file',
-            uuid: data.uuid ?? page.uuid ?? useUUID()
-        } satisfies SlatePage)
+        const newData: SlatePage = {
+            content: data.content || page.content || '<p></p>',
+            embeddedImages: data.embeddedImages || page.embeddedImages || [],
+            persistentData: data.persistentData || page.persistentData || null,
+            textType: data.textType || page.textType || 'html',
+            children: data.children || page.children || [],
+            name: data.name || page.name || 'Page',
+            icon: data.icon || page.icon || 'lucide:file',
+            uuid: data.uuid || page.uuid || useUUID()
+        } satisfies SlatePage
+
+        Object.assign(page, newData)
     }
 
     const setSlatePageContent = (pageUUID: MaybeRef<string> | ComputedRef<string>, content: string) => {
@@ -134,6 +136,7 @@ export const useSlateFile = () => {
         }
 
         pageMap.value.set(newPageUUID, newPage)
+        useNoteSaver().autoSave()
         await navigateTo(`/document/${newPageUUID}`)
     }
 
@@ -197,6 +200,8 @@ export const useSlateFile = () => {
             navigateTo(`/document/${newPageUUID}`)
         }
 
+        rebuildPageMap()
+
         return newPageUUID
     }
 
@@ -207,7 +212,20 @@ export const useSlateFile = () => {
      * @returns boolean - Whether the deletion was successful
      */
     const deletePage = (pageUUID: string, recursive: boolean = false): boolean => {
-        const pageToDelete = pageMap.value.get(pageUUID)
+        if ((currentSlateDoc.value?.pages.length || 1) <= 1 && currentSlateDoc.value?.pages[0]?.uuid == pageUUID) {
+            $t.add({
+                title: 'You cannot delete the only page in your document.',
+                color: 'error',
+                icon: 'lucide:circle-x'
+            })
+            return false
+        }
+
+        if(pageMap.value == null){
+            rebuildPageMap()
+        }
+
+        const pageToDelete = pageMap.value?.get(pageUUID)
         if (!pageToDelete) return false
 
         // Helper function to find parent page and index
@@ -254,7 +272,7 @@ export const useSlateFile = () => {
             pages.splice(index, 1)
         } else {
             // Delete only the page and promote its children
-            pageMap.value.delete(pageUUID)
+            pageMap.value?.delete(pageUUID)
             const childrenToPromote = pageToDelete.children || []
             pages.splice(index, 1, ...childrenToPromote)
         }
@@ -301,7 +319,11 @@ export const useSlateFile = () => {
      * @param operation Rename operation to perform
      */
     const renamePage = (pageUUID: string, operation: RenameOperation): void => {
-        const page = pageMap.value.get(pageUUID)
+        if(pageMap.value == null){
+            rebuildPageMap()
+        }
+
+        const page = pageMap.value?.get(pageUUID)
         if (!page) return
 
         let newName = page.name || ''
@@ -389,6 +411,11 @@ export const useSlateFile = () => {
      * @param name New title for the page
      */
     const setPageTitle = (pageUUID: string, name: string) => {
+        if(pageMap.value.get(pageUUID) == null)
+            rebuildPageMap()
+
+        // @ts-ignore please shut the fuck up
+        pageMap.value.get(pageUUID).name = name
         setSlatePageData(pageUUID, {
             name
         })
@@ -509,6 +536,25 @@ export const useSlateFile = () => {
         return expandedTreeNodes
     }
 
+    /**
+     * Gets the parent page of a given page UUID
+     * @param pageUUID UUID of the page to find parent for
+     * @returns Parent SlatePage or undefined if no parent (root level) or page not found
+     */
+    const getPageParent = (pageUUID: string): SlatePage | undefined => {
+        // Check if page exists
+        if (!pageMap.value.has(pageUUID)) return undefined
+
+        // Look through all pages to find parent
+        for (const [_, page] of pageMap.value) {
+            if (page.children?.some(child => child.uuid === pageUUID)) {
+                return page
+            }
+        }
+
+        return undefined
+    }
+
     return {
         getFilePath,
         isFileSaved,
@@ -541,6 +587,7 @@ export const useSlateFile = () => {
         cacheExpandedNode,
         uncacheExpandedNode,
         clearExpandedNodeCache,
-        getExpandedNodeCache
+        getExpandedNodeCache,
+        getPageParent
     }
 }

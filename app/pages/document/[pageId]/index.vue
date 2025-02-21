@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { SlateModalDocumentInformation, SlateSlideoverPagesTree } from '#components'
+import {
+    SlateModalDocumentInformation,
+    SlateModalPageRename,
+    SlateModalSelectIcon,
+    SlateSlideoverPagesTree,
+} from '#components'
 
 onMounted(() => {
     $appMenu.init($editor)
@@ -16,9 +21,9 @@ const $route = useRoute()
 const $appMenu = useAppMenu()
 const $save = useNoteSaver()
 const $slate = useSlateFile()
+const $slateCommon = useSlateCommon()
 const $m = useModal(), $t = useToast(), $s = useSlideover()
 
-const filePageDirs = ref([] as any[])
 const breadcrumbs = computed(() => {
     let arr = $slate.getCurrentNestedPageDirsPerformant($pageId).map((i: any) => {
         return {
@@ -67,11 +72,11 @@ watch($pageId, (newId, oldId) => {
 })
 
 const $editor = useSlateEditor($slate.getCurrentSlatePage($pageId)?.content || '', true, () => {
+    $slate.setSlatePageContent($pageId, $editor.value?.getHTML() || '<p></p>')
     $slate.setSavedStatus(false);
     $slate.setSavingFile(true);
     // This callback is called once the content inside the editor is updated
     if ($slate.getFilePath().value != null) {
-        $slate.setSlatePageContent($pageId, $editor.value?.getHTML() || '<p></p>')
         $save.autoSave()
     }
 })
@@ -180,7 +185,22 @@ function documentInformation() {
                                     <div data-tauri-drag-region class="px-1">{{item.label}}</div>
                                 </template>
                                 <template #page="{item}" data-tauri-drag-region>
-                                    <UButton data-tauri-drag-region class="px-1" :icon="item?.icon || 'lucide:file'" size="sm" :label="item?.label || 'Untitled Page'" variant="link" />
+                                    <UDropdownMenu :items="[
+                                        {
+                                            label: 'Rename Page',
+                                            onSelect () {
+                                                $slateCommon.renamePage($pageId, 'Page')
+                                            }
+                                        },
+                                        {
+                                            label: 'Change Icon',
+                                            onSelect () {
+                                                $slateCommon.changeIcon($pageId)
+                                            }
+                                        }
+                                    ]">
+                                        <UButton data-tauri-drag-region class="px-1" :icon="item?.icon || 'lucide:file'" size="sm" :label="item?.label || 'Untitled Page'" variant="link" />
+                                    </UDropdownMenu>
                                 </template>
                                 <template #dropdown="{item}" data-tauri-drag-region>
                                     <UDropdownMenu :items="(item as any).children || []">

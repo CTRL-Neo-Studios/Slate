@@ -2,6 +2,7 @@
 const name = ref('')
 const modal = useModal()
 const $t = useToast()
+const input = ref()
 
 const emit = defineEmits(['confirm'])
 
@@ -17,12 +18,16 @@ function onConfirm(newName: string) {
     }
     emit('confirm', newName)
 }
+
+onMounted(() => {
+    input.value?.focus()
+})
 </script>
 
 <template>
     <UModal title="Page Rename">
         <template #body>
-            <UInput v-model="name"/>
+            <UInput ref="input" v-model="name" placeholder="New Page Name" class="w-full"/>
         </template>
         <template #footer>
             <div class="flex gap-2 w-full justify-end items-center">

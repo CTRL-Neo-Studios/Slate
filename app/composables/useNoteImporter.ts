@@ -29,11 +29,14 @@ export const useNoteImporter = () => {
                     description: `Opened from directory ${selectedFile}`,
                     color: 'success'
                 });
+
+            $slate.rebuildPageMap()
         } catch (error) {
             $t.add({
                 title: `Error`,
                 description: `Error occurred while opening note: ${error}`,
-                color: 'error'
+                color: 'error',
+                icon: 'lucide:circle-x'
             });
             if (fallbackFilePath) {
                 await importFile(fallbackFilePath)

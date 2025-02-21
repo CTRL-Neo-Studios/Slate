@@ -1,0 +1,1 @@
+export type PossiblyRef<T> = MaybeRef<T> | ComputedRef<T>
