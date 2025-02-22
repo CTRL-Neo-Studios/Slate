@@ -39,6 +39,7 @@
   "bundle": {
     "active": true,
     "longDescription": "",
+    "createUpdaterArtifacts": true,
     "macOS": {
       "entitlements": "./Entitlements.plist",
       "exceptionDomain": "",

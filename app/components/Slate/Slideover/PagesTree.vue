@@ -21,22 +21,22 @@ onMounted(() => {
 
 const handleRename = (uuid: string, currentName: string) => {
     $slateCommon.renamePage(uuid, currentName)
-    slideover.close()
+    // slideover.close()
 }
 
 const handleDelete = (uuid: string, recursive: boolean) => {
     $slateCommon.deletePage(uuid, recursive)
-    slideover.close()
+    // slideover.close()
 }
 
 const handleCreatePage = async (mode: 'root' | 'current' | 'under', targetPageUUID: string) => {
     await $slateCommon.createPage(mode, targetPageUUID)
-    await slideover.close()
+    // await slideover.close()
 }
 
 const handleChangeIcon = (uuid: string) => {
     $slateCommon.changeIcon(uuid)
-    slideover.close()
+    // slideover.close()
 }
 </script>
 

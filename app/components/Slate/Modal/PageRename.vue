@@ -25,7 +25,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <UModal title="Page Rename">
+    <UModal title="Page Rename" class="z-10">
         <template #body>
             <UInput ref="input" v-model="name" placeholder="New Page Name" class="w-full"/>
         </template>

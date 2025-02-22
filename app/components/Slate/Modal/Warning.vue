@@ -20,7 +20,7 @@ function onConfirm() {
 </script>
 
 <template>
-    <UModal>
+    <UModal class="z-10">
         <template #footer>
             <div class="flex gap-2 w-full justify-end items-center">
                 <UButton color="neutral" :label="optCancelLabel" @click="modal.close()" />

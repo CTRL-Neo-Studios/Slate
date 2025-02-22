@@ -63,7 +63,7 @@ const onConfirm = (newIcon: string) => {
 </script>
 
 <template>
-    <UModal title="Select Icon">
+    <UModal title="Select Icon" class="z-10">
         <template #title>
             <div class="flex items-center gap-3">
                 <div>Select Icon</div>
