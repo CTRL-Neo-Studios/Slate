@@ -1,10 +1,9 @@
 <script setup lang="ts">
 const name = ref('')
-const modal = useModal()
 const $t = useToast()
 const input = ref()
 
-const emit = defineEmits(['confirm'])
+const emit = defineEmits(['confirm', 'close'])
 
 function onConfirm(newName: string) {
     if(name.value.length < 2){
@@ -22,16 +21,21 @@ function onConfirm(newName: string) {
 onMounted(() => {
     input.value?.focus()
 })
+
+function closeModal() {
+    emit('close', false)
+}
 </script>
 
 <template>
-    <UModal title="Page Rename" class="z-10">
+    <UModal title="Page Rename" class="z-10"
+            :close="{ onClick: () => closeModal() }">
         <template #body>
             <UInput ref="input" v-model="name" placeholder="New Page Name" class="w-full"/>
         </template>
         <template #footer>
             <div class="flex gap-2 w-full justify-end items-center">
-                <UButton color="neutral" :label="'Cancel'" @click="modal.close()" />
+                <UButton color="neutral" :label="'Cancel'" @click="closeModal()" />
                 <UButton color="warning" :label="'Confirm'" @click="onConfirm(name)" />
             </div>
         </template>

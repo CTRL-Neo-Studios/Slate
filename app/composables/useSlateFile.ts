@@ -2,7 +2,7 @@ import type { SlateDocument, SlateMetadata, SlatePage } from '~/slate.types'
 import { SlateModalWarning } from '#components'
 
 export const useSlateFile = () => {
-    const $m = useModal(), $t = useToast()
+    const $m = useOverlay(), $t = useToast()
 
     const filePath = useState<string | null>('filePath', () => null) // Tracks the current file path
     const isSaved = useState<boolean>('isSaved', () => false) // Tracks whether the file is saved
@@ -12,6 +12,15 @@ export const useSlateFile = () => {
     const expandedTreeNodes = useState<string[]>("expandedTreeNodes", () => [])
     // const expandedNodes = useState<Set<string>>('expandedNodes', () => new Set())
     // const pathCache = new Map<string, PagePathNode[]>()
+
+    const clearFile = () => {
+        useNoteSaver().clearCurrentAutoSave()
+        resetFileState()
+        filePath.value = null
+        currentSlateDoc.value = null
+        expandedTreeNodes.value = []
+        pageMap.value.clear()
+    }
 
     const setFilePath = (path: string) => {
         filePath.value = path
@@ -58,9 +67,10 @@ export const useSlateFile = () => {
         if(currentSlateDoc.value == null) return;
 
         currentSlateDoc.value.metaData = {
+            version: 2,
             fileUuid: data.fileUuid || currentSlateDoc.value?.metaData?.fileUuid || '',
             endpoint: data.endpoint || currentSlateDoc.value?.metaData?.endpoint || '',
-            savesOnCloud: data.savesOnCloud || currentSlateDoc.value?.metaData?.savesOnCloud || false,
+            savesOnCloud: data.savesOnCloud || currentSlateDoc.value?.metaData?.savesOnCloud || false
         }
     }
 
@@ -185,16 +195,21 @@ export const useSlateFile = () => {
     const createSlateDocument = () => {
         const newPageUUID = useUUID()
         if (currentSlateDoc.value != null && !isSaved.value) {
-            $m.open(SlateModalWarning, {
-                title: 'Create New Document',
-                description: 'There are unsaved changes in the current document. Are you sure you want to move on to a new one without saving your current changes?',
-                optCancelLabel: 'No, Let Me Save First',
-                optConfirmLabel: 'Yes, Discard My Changes',
-                async onConfirm() {
-                    currentSlateDoc.value = defaultSlateDocument(newPageUUID)
-                    await navigateTo(`/document/${newPageUUID}`)
+            const modal = $m.create(SlateModalWarning, {
+                props: {
+                    title: 'Create New Document',
+                    description: 'There are unsaved changes in the current document. Are you sure you want to move on to a new one without saving your current changes?',
+                    optCancelLabel: 'No, Let Me Save First',
+                    optConfirmLabel: 'Yes, Discard My Changes',
+                    async onConfirm() {
+                        clearFile()
+                        currentSlateDoc.value = defaultSlateDocument(newPageUUID)
+                        await navigateTo(`/document/${newPageUUID}`)
+                        modal.close()
+                    },
                 },
             })
+            modal.open()
         } else {
             currentSlateDoc.value = defaultSlateDocument(newPageUUID)
             navigateTo(`/document/${newPageUUID}`)
@@ -588,6 +603,7 @@ export const useSlateFile = () => {
         uncacheExpandedNode,
         clearExpandedNodeCache,
         getExpandedNodeCache,
-        getPageParent
+        getPageParent,
+        clearFile
     }
 }

@@ -128,21 +128,21 @@ export const useAppMenu = () => {
                         text: 'Edit',
                         items: editMenu,
                     },
-                    {
-                        id: 'view',
-                        text: 'View',
-                        items: [], // Empty View menu
-                    },
-                    {
-                        id: 'window',
-                        text: 'Window',
-                        items: [], // Empty Window menu
-                    },
-                    {
-                        id: 'help',
-                        text: 'Help',
-                        items: [], // Empty Help menu
-                    },
+                    // {
+                    //     id: 'view',
+                    //     text: 'View',
+                    //     items: [], // Empty View menu
+                    // },
+                    // {
+                    //     id: 'window',
+                    //     text: 'Window',
+                    //     items: [], // Empty Window menu
+                    // },
+                    // {
+                    //     id: 'help',
+                    //     text: 'Help',
+                    //     items: [], // Empty Help menu
+                    // },
                 ],
             });
 

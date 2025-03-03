@@ -4,14 +4,13 @@ import type { SlatePage } from '~/slate.types'
 import { SlateModalPageRename, SlateModalSelectIcon, SlateModalWarning } from '#components'
 
 const props = defineProps<{pages: SlatePage[], currentPage: string}>()
+const emit = defineEmits(['close'])
 
 const $slate = useSlateFile()
 const $slateCommon = useSlateCommon()
-const slideover = useSlideover()
 
 // Track expanded state
 const expandedItems = ref<string[]>([])
-const modal = useModal()
 const $t = useToast()
 
 onMounted(() => {
@@ -37,6 +36,10 @@ const handleCreatePage = async (mode: 'root' | 'current' | 'under', targetPageUU
 const handleChangeIcon = (uuid: string) => {
     $slateCommon.changeIcon(uuid)
     // slideover.close()
+}
+
+function closeSlideover() {
+    emit('close', false)
 }
 </script>
 
@@ -128,7 +131,7 @@ const handleChangeIcon = (uuid: string) => {
                             size="sm"
                             @click="() => {
                                 navigateTo(`/document/${item.value.uuid}`)
-                                slideover.close()
+                                closeSlideover()
                             }"
                         />
                         <template v-if="(item.value.children?.length || 0) > 0">

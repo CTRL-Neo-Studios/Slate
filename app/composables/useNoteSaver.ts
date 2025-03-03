@@ -8,7 +8,7 @@ import type { SlateDocument } from '~/slate.types'
 export const useNoteSaver = () => {
     const $slate = useSlateFile();
     const $t = useToast();
-    const $m = useModal()
+    const $m = useOverlay()
 
     let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -65,11 +65,15 @@ export const useNoteSaver = () => {
         }
     };
 
-    const autoSave = () => {
-        // Clear the previous timeout if it exists
+    const clearCurrentAutoSave = () => {
         if (autoSaveTimeout) {
             clearTimeout(autoSaveTimeout);
         }
+    }
+
+    const autoSave = () => {
+        // Clear the previous timeout if it exists
+        clearCurrentAutoSave()
 
         // Set a new timeout for auto-saving
         autoSaveTimeout = setTimeout(async () => {
@@ -80,25 +84,29 @@ export const useNoteSaver = () => {
 
     const saveBeforeQuit = () => {
         if (!$slate.isFileSaved().value || !unref($slate.getFilePath())) {
-            $m.open(SlateModalWarning, {
-                title: 'Quitting Slate',
-                description: 'Your current note is unsaved! Are you sure you want to quit right now without saving?',
-                optCancelLabel: 'Don\'t Quit',
-                optConfirmLabel: 'Quit Without Saving',
-                async onConfirm() {
-                    await exit(0)
-                }
-            })
+            $m.create(SlateModalWarning, {
+                props: {
+                    title: 'Quitting Slate',
+                    description: 'Your current note is unsaved! Are you sure you want to quit right now without saving?',
+                    optCancelLabel: 'Don\'t Quit',
+                    optConfirmLabel: 'Quit Without Saving',
+                    async onConfirm() {
+                        await exit(0)
+                    },
+                },
+            }).open()
         } else {
-            $m.open(SlateModalWarning, {
-                title: 'Quitting Slate',
-                description: 'Are you sure you want to quit?',
-                async onConfirm() {
-                    await exit(0)
-                }
-            })
+            $m.create(SlateModalWarning, {
+                props: {
+                    title: 'Quitting Slate',
+                    description: 'Are you sure you want to quit?',
+                    async onConfirm() {
+                        await exit(0)
+                    },
+                },
+            }).open()
         }
     }
 
-    return { saveNote, autoSave, saveBeforeQuit };
+    return { saveNote, autoSave, saveBeforeQuit, clearCurrentAutoSave };
 };

@@ -4,8 +4,9 @@ export const defaultSlateDocument = (pageUUID: string): SlateDocument => {
     return {
         metaData: {
             endpoint: '',
-            fileUuid: '',
-            savesOnCloud: false
+            fileUuid: useUUID(),
+            savesOnCloud: false,
+            version: 2,
         },
         pages: [
             defaultSlatePage(pageUUID)

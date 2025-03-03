@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const modal = useModal()
 
 defineProps({
     optCancelLabel: {
@@ -12,10 +11,14 @@ defineProps({
     }
 })
 
-const emit = defineEmits(['confirm'])
+const emit = defineEmits(['confirm', 'close'])
 
 function onConfirm() {
     emit('confirm')
+}
+
+function closeModal() {
+    emit('close', false)
 }
 </script>
 
@@ -23,7 +26,7 @@ function onConfirm() {
     <UModal class="z-10">
         <template #footer>
             <div class="flex gap-2 w-full justify-end items-center">
-                <UButton color="neutral" :label="optCancelLabel" @click="modal.close()" />
+                <UButton color="neutral" :label="optCancelLabel" @click="closeModal()" />
                 <UButton color="warning" :label="optConfirmLabel" @click="onConfirm" />
             </div>
         </template>

@@ -22,7 +22,10 @@ const $appMenu = useAppMenu()
 const $save = useNoteSaver()
 const $slate = useSlateFile()
 const $slateCommon = useSlateCommon()
-const $m = useModal(), $t = useToast(), $s = useSlideover()
+const $m = useOverlay(), $t = useToast()
+
+const slateDocInfoModal = $m.create(SlateModalDocumentInformation)
+const slatePageTreeSliderover = $m.create(SlateSlideoverPagesTree)
 
 const breadcrumbs = computed(() => {
     let arr = $slate.getCurrentNestedPageDirsPerformant($pageId).map((i: any) => {
@@ -266,14 +269,14 @@ function documentInformation() {
                             <div class="w-fit flex items-center justify-end rounded-lg backdrop-blur-md p-1 gap-1 select-none">
                                 <UTooltip :text="documentInformation()" :delay-duration="200">
                                     <UButton icon="lucide:ellipsis" size="xs" variant="ghost" @click="() => {
-                                        $m.open(SlateModalDocumentInformation, {
+                                        slateDocInfoModal.open({
                                             wordCount: $editor?.storage.characterCount.words(),
                                             charCount: $editor?.storage.characterCount.characters()
                                         })
                                     }"/>
                                 </UTooltip>
                                 <UButton icon="lucide:menu" size="xs" variant="ghost" @click="() => {
-                                        $s.open(SlateSlideoverPagesTree, {
+                                        slatePageTreeSliderover.open({
                                             pages: $slate.getCurrentSlateDoc().value?.pages,
                                             currentPage: $pageId
                                         })

@@ -4,7 +4,7 @@ import type { PossiblyRef } from '~/utility.types'
 export const useSlateCommon = () => {
     const $slate = useSlateFile()
     const $save = useNoteSaver()
-    const $t = useToast(), $m = useModal()
+    const $t = useToast(), $m = useOverlay()
 
     const changeIcon = (uuid: PossiblyRef<string>) => {
         if ($slate.getFilePath().value == null) {
@@ -15,14 +15,18 @@ export const useSlateCommon = () => {
             return
         }
 
-        $m.open(SlateModalSelectIcon, {
-            async onConfirm(newIcon: string) {
-                $slate.setSlatePageData(unref(uuid), {icon: newIcon})
-                $slate.setSavingFile(true)
-                $save.autoSave()
-                await $m.close()
-            }
+        const selectIconModal = $m.create(SlateModalSelectIcon, {
+            props: {
+                async onConfirm(newIcon: string) {
+                    $slate.setSlatePageData(unref(uuid), { icon: newIcon })
+                    $slate.setSavingFile(true)
+                    $save.autoSave()
+                    selectIconModal.close()
+                },
+            },
         })
+
+        selectIconModal.open()
     }
 
     const renamePage = (uuid: PossiblyRef<string>, currentName: PossiblyRef<string>) => {
@@ -34,21 +38,24 @@ export const useSlateCommon = () => {
             return
         }
 
-        $m.open(SlateModalPageRename, {
-            async onConfirm(newName: string) {
-                if (unref(currentName).trim()) {
-                    $slate.setSavingFile(true)
-                    $slate.renamePage(unref(uuid), {
-                        type: 'rename',
-                        value: '.*', // Replace entire name
-                        replaceValue: newName.trim()
-                    })
-                    $slate.setSavingFile(true)
-                    $save.autoSave()
-                }
-                await $m.close()
-            }
+        const pageRenameModal = $m.create(SlateModalPageRename, {
+            props: {
+                async onConfirm(newName: string) {
+                    if (unref(currentName).trim()) {
+                        $slate.setSavingFile(true)
+                        $slate.renamePage(unref(uuid), {
+                            type: 'rename',
+                            value: '.*', // Replace entire name
+                            replaceValue: newName.trim(),
+                        })
+                        $slate.setSavingFile(true)
+                        $save.autoSave()
+                    }
+                    pageRenameModal.close()
+                },
+            },
         })
+        pageRenameModal.open()
     }
 
     /**
@@ -102,15 +109,18 @@ export const useSlateCommon = () => {
 
         let hasChildren: boolean = (($slate.getCurrentSlatePage(uuid)?.children.length || 0) > 0) && recursive
 
-        $m.open(SlateModalWarning, {
-            title: 'Deleting Page',
-            description: `Are you sure you want to delete this page${hasChildren ? ' and its children' : ''}?`,
-            async onConfirm() {
-                $slate.deletePage(uuid, recursive) // true for recursive deletion
-                useNoteSaver().autoSave()
-                await $m.close()
-            }
+        const warningModal = $m.create(SlateModalWarning, {
+            props: {
+                title: 'Deleting Page',
+                description: `Are you sure you want to delete this page${hasChildren ? ' and its children' : ''}?`,
+                async onConfirm() {
+                    $slate.deletePage(uuid, recursive) // true for recursive deletion
+                    useNoteSaver().autoSave()
+                    warningModal.close()
+                },
+            },
         })
+        warningModal.open()
     }
 
     return {

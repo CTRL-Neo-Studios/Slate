@@ -8,7 +8,7 @@ import type { SlateDocument } from '~/slate.types'
 export const useNoteImporter = () => {
     const $slate = useSlateFile()
     const $t = useToast()
-    const $m = useModal()
+    const $m = useOverlay()
 
     const confirmImport = async () => {
         const fallbackFilePath = unref($slate.getFilePath())
@@ -44,20 +44,22 @@ export const useNoteImporter = () => {
                 $slate.createSlateDocument()
             }
             console.error('Error importing note:', error);
-        } finally {
-            await $m.close()
         }
     }
 
     const importNote = async () => {
         if ($slate.getFilePath().value != null && !$slate.isFileSaved().value){
-            $m.open(SlateModalWarning, {
-                title: 'Importing Note',
-                description: 'This will override your currently unsaved note. Are you sure you want to continue?',
-                async onConfirm() {
-                    await confirmImport()
-                }
+            const modal = $m.create(SlateModalWarning, {
+                props: {
+                    title: 'Importing Note',
+                    description: 'This will override your currently unsaved note. Are you sure you want to continue?',
+                    async onConfirm() {
+                        await confirmImport()
+                        modal.close()
+                    },
+                },
             })
+            modal.open()
         } else {
             await confirmImport()
         }
@@ -65,16 +67,21 @@ export const useNoteImporter = () => {
 
     const importFile = async (selectedFile: string | null) => {
         if (!selectedFile) {
-            await $m.close()
+            $t.add({
+                title: 'No file was selected.'
+            })
             return
         }
 
         if (selectedFile.endsWith('sdf')) {
             await readSDF(selectedFile)
+            useSlateFile().clearFile()
         } else if (selectedFile.endsWith('md')) {
             await readMarkdown(selectedFile)
+            useSlateFile().clearFile()
         } else if (selectedFile.endsWith('txt')) {
             await readTXT(selectedFile)
+            useSlateFile().clearFile()
         } else {
             $t.add({
                 title: 'Unable to Import Note',
@@ -82,7 +89,6 @@ export const useNoteImporter = () => {
                 icon: 'lucide:circle-x',
                 color: 'error'
             })
-            await $m.close()
             return
         }
     }

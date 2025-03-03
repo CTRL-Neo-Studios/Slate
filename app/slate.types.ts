@@ -18,4 +18,5 @@ export type SlateMetadata = {
     savesOnCloud: boolean,
     endpoint: string,
     fileUuid: string,
+    version: 2,
 }

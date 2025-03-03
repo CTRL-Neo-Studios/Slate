@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const modal = useModal()
-
 defineProps({
     wordCount: {
         type: Number,
@@ -11,10 +9,14 @@ defineProps({
         default: 0
     }
 })
+
+const emit = defineEmits<{ close: [boolean] }>()
 </script>
 
 <template>
-    <UModal title="Document Information">
+    <UModal
+        :close="{ onClick: () => emit('close', false) }"
+        title="Document Information">
         <template #body>
             <div class="grid w-full grid-cols-2 text-sm gap-2">
                 <div class="text-left">Word Count</div>
