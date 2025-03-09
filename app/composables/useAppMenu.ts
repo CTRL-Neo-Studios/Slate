@@ -48,6 +48,15 @@ export const useAppMenu = () => {
 
             const slateMenu: MenuTypes[] = [
                 {
+                    id: 'settings',
+                    text: 'Settings',
+                    accelerator: 'CommandOrControl+,',
+                    action: async () => {
+
+                    },
+                },
+                separator,
+                {
                     id: 'quit',
                     text: 'Quit',
                     accelerator: 'CommandOrControl+Q',

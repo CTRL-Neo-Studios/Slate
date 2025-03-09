@@ -20,3 +20,8 @@ export type SlateMetadata = {
     fileUuid: string,
     version: 2,
 }
+
+export type SlateConfig = {
+    colorTheme: 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose' | 'none'
+
+}

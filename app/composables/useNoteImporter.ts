@@ -75,13 +75,10 @@ export const useNoteImporter = () => {
 
         if (selectedFile.endsWith('sdf')) {
             await readSDF(selectedFile)
-            useSlateFile().clearFile()
         } else if (selectedFile.endsWith('md')) {
             await readMarkdown(selectedFile)
-            useSlateFile().clearFile()
         } else if (selectedFile.endsWith('txt')) {
             await readTXT(selectedFile)
-            useSlateFile().clearFile()
         } else {
             $t.add({
                 title: 'Unable to Import Note',
@@ -105,6 +102,8 @@ export const useNoteImporter = () => {
 
         console.log(noteData as SlateDocument)
 
+        useSlateFile().clearFile()
+
         // Update the file state
         $slate.setFilePath(path);
         $slate.setSavedStatus(true);
@@ -117,6 +116,8 @@ export const useNoteImporter = () => {
     const readMarkdown = async (path: string) => {
         const fileMarkdown = await readTextFile(path);
         const mdToHtml = await marked.parse(fileMarkdown)
+
+        useSlateFile().clearFile()
 
         // Update the file state
         $slate.setFilePath(path);
@@ -131,6 +132,8 @@ export const useNoteImporter = () => {
 
     const readTXT = async (path: string) => {
         const textFile = await readTextFile(path);
+
+        useSlateFile().clearFile()
 
         // Update the file state
         $slate.setFilePath(path);

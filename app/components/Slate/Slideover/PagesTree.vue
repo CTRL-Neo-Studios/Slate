@@ -13,29 +13,29 @@ const $slateCommon = useSlateCommon()
 const expandedItems = ref<string[]>([])
 const $t = useToast()
 
-onMounted(() => {
+function remap() {
     const path = $slate.getCurrentNestedPageDirs(props.currentPage)
     expandedItems.value = path.map(node => node.uuid)
+}
+onMounted(() => {
+    remap()
+    $slate.subscribeOnPageReindex(remap)
 })
 
 const handleRename = (uuid: string, currentName: string) => {
     $slateCommon.renamePage(uuid, currentName)
-    // slideover.close()
 }
 
 const handleDelete = (uuid: string, recursive: boolean) => {
     $slateCommon.deletePage(uuid, recursive)
-    // slideover.close()
 }
 
 const handleCreatePage = async (mode: 'root' | 'current' | 'under', targetPageUUID: string) => {
     await $slateCommon.createPage(mode, targetPageUUID)
-    // await slideover.close()
 }
 
 const handleChangeIcon = (uuid: string) => {
     $slateCommon.changeIcon(uuid)
-    // slideover.close()
 }
 
 function closeSlideover() {
@@ -45,9 +45,9 @@ function closeSlideover() {
 
 <template>
     <USlideover title="Document Pages" description="All of the pages in this Slate Document.">
-        <template #body>
-            <div class="flex items-center justify-start gap-1 mb-2">
-                <UDropdownMenu :items="[
+        <template #close>
+            <div class="flex-grow"/>
+            <UDropdownMenu :items="[
                     {
                         label: 'In Document',
                         onSelect() {
@@ -68,10 +68,10 @@ function closeSlideover() {
                         }
                     },
                 ]">
-                    <UButton icon="lucide:file-plus" variant="soft" size="sm" label="New Page..."/>
-                </UDropdownMenu>
-            </div>
-            <USeparator class="mb-2"/>
+                <UButton icon="lucide:file-plus" variant="soft" size="sm" label="New Page..."/>
+            </UDropdownMenu>
+        </template>
+        <template #body>
             <TreeRoot
                 :items="pages"
                 v-slot="{ flattenItems }"

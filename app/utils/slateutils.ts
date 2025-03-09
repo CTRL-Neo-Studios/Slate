@@ -8,9 +8,7 @@ export const defaultSlateDocument = (pageUUID: string): SlateDocument => {
             savesOnCloud: false,
             version: 2,
         },
-        pages: [
-            defaultSlatePage(pageUUID)
-        ]
+        pages: []
     }
 }
 

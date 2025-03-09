@@ -1,5 +1,6 @@
 import type { SlateDocument, SlateMetadata, SlatePage } from '~/slate.types'
 import { SlateModalWarning } from '#components'
+import type { PossiblyRef } from '~/utility.types'
 
 export const useSlateFile = () => {
     const $m = useOverlay(), $t = useToast()
@@ -10,6 +11,17 @@ export const useSlateFile = () => {
     const currentSlateDoc = useState<SlateDocument | null>('slateDocument', () => null)
     const pageMap = useState<Map<string, SlatePage>>('pageMap', () => new Map())
     const expandedTreeNodes = useState<string[]>("expandedTreeNodes", () => [])
+
+    const pageReindexSubscribers = useState<(() => void)[]>(() => []);
+    const subscribeOnPageReindex = (callback: () => void): () => void => {
+        pageReindexSubscribers.value.push(callback);
+        return () => {
+            pageReindexSubscribers.value.splice(pageReindexSubscribers.value.indexOf(callback), 1);
+        };
+    };
+    const invokeOnPageReindex = () => {
+        pageReindexSubscribers.value.forEach((subscriber) => subscriber())
+    }
     // const expandedNodes = useState<Set<string>>('expandedNodes', () => new Set())
     // const pathCache = new Map<string, PagePathNode[]>()
 
@@ -120,6 +132,7 @@ export const useSlateFile = () => {
         }
 
         mapPages(currentSlateDoc.value.pages)
+        invokeOnPageReindex()
     }
 
     const addChildPage = (parentUUID: string, newPage: SlatePage) => {
@@ -211,7 +224,9 @@ export const useSlateFile = () => {
             })
             modal.open()
         } else {
+            clearFile()
             currentSlateDoc.value = defaultSlateDocument(newPageUUID)
+            currentSlateDoc.value.pages.push(defaultSlatePage(newPageUUID))
             navigateTo(`/document/${newPageUUID}`)
         }
 
@@ -570,6 +585,66 @@ export const useSlateFile = () => {
         return undefined
     }
 
+    /**
+     * Converts the current slate document structure to a nodes-edges format
+     * @param rootNodeName Optional name for the root node that contains all top-level pages
+     * @param currentUuid
+     * @returns Object containing nodes and edges for graph visualization
+     */
+    const getPagesAsNodesAndEdges = (rootNodeName: string = 'Document Root', currentUuid: PossiblyRef<string>) => {
+        if (!currentSlateDoc.value) {
+            return { nodes: {}, edges: {} };
+        }
+
+        const ROOT_NODE_ID = 'root_node';
+        const nodes: Record<string, { name: string, id: string, icon?: string, color: string, size: number, label: boolean }> = {};
+        const edges: Record<string, { source: string, target: string, color: string }> = {};
+
+        // Create a root node that will be parent to all top-level pages
+        nodes[ROOT_NODE_ID] = {
+            name: rootNodeName,
+            id: ROOT_NODE_ID,
+            icon: 'lucide:file-text', // Default icon for root node
+            color: 'blue',
+            size: 15,
+            label: true
+        };
+
+        // Process all pages in the document
+        const processPages = (pages: SlatePage[], parentId: string = ROOT_NODE_ID) => {
+            for (const page of pages) {
+                // Create node for this page
+                nodes[page.uuid] = {
+                    name: `${page.name || 'Untitled'}` + (unref(currentUuid) == page.uuid ? ' [Current Page]' : ''),
+                    id: page.uuid,
+                    icon: page.icon || 'lucide:file',
+                    color: unref(currentUuid) == page.uuid ? 'green' : 'gray',
+                    size: unref(currentUuid) == page.uuid ? 10 : 7,
+                    label: true
+                };
+
+                // Create edge connecting this page to its parent
+                const edgeId = `edge_${parentId}_${page.uuid}`;
+                edges[edgeId] = {
+                    source: parentId,
+                    target: page.uuid,
+                    color: 'gray'
+                };
+
+                // Process children recursively
+                if (page.children?.length) {
+                    processPages(page.children, page.uuid);
+                }
+            }
+        };
+
+        // Start processing from the root pages, with the root node as their parent
+        processPages(currentSlateDoc.value.pages);
+
+        return { nodes, edges };
+    };
+
+
     return {
         getFilePath,
         isFileSaved,
@@ -604,6 +679,8 @@ export const useSlateFile = () => {
         clearExpandedNodeCache,
         getExpandedNodeCache,
         getPageParent,
-        clearFile
+        clearFile,
+        subscribeOnPageReindex,
+        getPagesAsNodesAndEdges
     }
 }

@@ -5,9 +5,33 @@
 
 @theme {
     --font-sans: 'Inter', 'Noto Sans Simplified Chinese', 'Times New Roman', serif, system-ui, -apple-system,
-        BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji,
+    Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+
+    --color-peach-orange: oklch(89.725% 0.09003 77.115);
+    --color-peach-orange-50: oklch(100% 0 none);
+    --color-peach-orange-100: oklch(100% 0 none);
+    --color-peach-orange-200: oklch(100% 0 none);
+    --color-peach-orange-300: oklch(97.91% 0.01802 78.244);
+    --color-peach-orange-400: oklch(93.627% 0.05441 76.938);
+    --color-peach-orange-500: oklch(89.725% 0.09003 77.115);
+    --color-peach-orange-600: oklch(84.552% 0.13268 74.753);
+    --color-peach-orange-700: oklch(80.087% 0.16256 70.417);
+    --color-peach-orange-800: oklch(73.615% 0.16624 64.189);
+    --color-peach-orange-900: oklch(60.608% 0.13567 65.287);
+    --color-peach-orange-950: oklch(53.749% 0.11992 65.714);
 }
+
+/* Black and White Theme */
+/*:root {*/
+/*    !*--ui-primary: var(--color-peach-orange);*!*/
+/*    --ui-primary: oklch(25.62% 0 0);*/
+/*}*/
+
+/*.dark {*/
+/*    !*--ui-primary: var(--color-peach-orange-400);*!*/
+/*    --ui-primary: white;*/
+/*}*/
 
 /** {*/
 /*  font-family: "Inter", "Noto Sans Simplified Chinese", serif, sans-serif, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;*/

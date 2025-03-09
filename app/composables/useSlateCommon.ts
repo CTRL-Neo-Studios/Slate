@@ -29,7 +29,7 @@ export const useSlateCommon = () => {
         selectIconModal.open()
     }
 
-    const renamePage = (uuid: PossiblyRef<string>, currentName: PossiblyRef<string>) => {
+    const renamePage = (uuid: PossiblyRef<string>, currentName: PossiblyRef<string>, callback: any = null) => {
         if ($slate.getFilePath().value == null) {
             $t.add({
                 title: 'Please save the file first.',
@@ -52,6 +52,8 @@ export const useSlateCommon = () => {
                         $save.autoSave()
                     }
                     pageRenameModal.close()
+                    if(callback != null)
+                        callback()
                 },
             },
         })

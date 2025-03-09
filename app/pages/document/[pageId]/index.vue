@@ -1,10 +1,39 @@
 <script setup lang="ts">
 import {
-    SlateModalDocumentInformation,
+    SlateModalDocumentInformation, SlateModalNodesView,
     SlateModalPageRename,
     SlateModalSelectIcon,
     SlateSlideoverPagesTree,
 } from '#components'
+
+definePageMeta({
+    layout: 'pages-directory'
+})
+
+defineShortcuts({
+    meta_g: {
+        usingInput: true,
+        handler: () => {
+            isOpenedPageTreeSlideover.value = !isOpenedPageTreeSlideover.value
+            if(isOpenedPageTreeSlideover.value) {
+                pagesTree()
+            }else {
+                slatePageTreeSliderover.close()
+            }
+        },
+    },
+    meta_shift_g: {
+        usingInput: true,
+        handler: () => {
+            isOpenedNodesView.value = !isOpenedNodesView.value
+            if(isOpenedNodesView.value) {
+                nodesView()
+            }else {
+                slateNodesViewModal.close()
+            }
+        }
+    }
+})
 
 onMounted(() => {
     $appMenu.init($editor)
@@ -26,6 +55,8 @@ const $m = useOverlay(), $t = useToast()
 
 const slateDocInfoModal = $m.create(SlateModalDocumentInformation)
 const slatePageTreeSliderover = $m.create(SlateSlideoverPagesTree)
+const slateNodesViewModal = $m.create(SlateModalNodesView)
+const isOpenedPageTreeSlideover = ref(false), isOpenedNodesView = ref(false)
 
 const breadcrumbs = computed(() => {
     let arr = $slate.getCurrentNestedPageDirsPerformant($pageId).map((i: any) => {
@@ -173,11 +204,24 @@ function documentInformation() {
     return `${$editor.value?.storage.characterCount.words()} Words, ${$editor.value?.storage.characterCount.characters()} Characters`
 }
 
+function pagesTree() {
+    slatePageTreeSliderover.open({
+        pages: $slate.getCurrentSlateDoc().value?.pages,
+        currentPage: $pageId,
+    })
+}
+
+function nodesView() {
+    slateNodesViewModal.open({
+        currentPage: $pageId,
+    })
+}
+
 </script>
 
 <template>
     <div>
-        <div class="w-full min-h-screen flex justify-center items-start">
+        <div class="w-full flex justify-center items-start min-h-screen">
             <div class="h-full sm:w-xl md:w-2xl w-3xl lg:w-4xl xl:w-5xl">
                 <div class="w-full fixed top-0 left-0 right-0 h-fit z-10">
                     <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default" data-tauri-drag-region>
@@ -231,9 +275,11 @@ function documentInformation() {
                                 <USelect v-model="currentTextStyle" size="xs" :items="textStylesSelect"
                                          :disabled="!$editor?.can().chain().focus().toggleHeading({level: 1}).run()"
                                          @update:model-value="setStyle" />
-                                <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
-                                         :disabled="!$editor?.can().chain().focus().toggleBold().run()"
-                                         @click="$editor?.chain().focus().toggleBold().run()"/>
+                                <UTooltip text="Bold" :kbds="['meta', 'B']">
+                                    <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
+                                             :disabled="!$editor?.can().chain().focus().toggleBold().run()"
+                                             @click="$editor?.chain().focus().toggleBold().run()"/>
+                                </UTooltip>
                                 <UButton icon="lucide:italic" size="xs" :variant="italicToggled"
                                          :disabled="!$editor?.can().chain().focus().toggleItalic().run()"
                                          @click="$editor?.chain().focus().toggleItalic().run()"/>
@@ -275,12 +321,16 @@ function documentInformation() {
                                         })
                                     }"/>
                                 </UTooltip>
-                                <UButton icon="lucide:menu" size="xs" variant="ghost" @click="() => {
-                                        slatePageTreeSliderover.open({
-                                            pages: $slate.getCurrentSlateDoc().value?.pages,
-                                            currentPage: $pageId
-                                        })
+                                <UTooltip :kbds="['meta', 'G']" text="Page Trees">
+                                    <UButton icon="lucide:menu" size="xs" variant="ghost" @click="() => {
+                                        pagesTree()
                                     }"/>
+                                </UTooltip>
+                                <UTooltip :kbds="['meta', 'shift', 'G']" text="Nodes View">
+                                    <UButton icon="lucide:network" size="xs" variant="ghost" @click="() => {
+                                        nodesView()
+                                    }"/>
+                                </UTooltip>
                             </div>
                         </div>
                     </div>
