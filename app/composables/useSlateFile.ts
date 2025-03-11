@@ -78,12 +78,7 @@ export const useSlateFile = () => {
     const setSlateDocumentMetadata = (data: Partial<SlateMetadata>) => {
         if(currentSlateDoc.value == null) return;
 
-        currentSlateDoc.value.metaData = {
-            version: 2,
-            fileUuid: data.fileUuid || currentSlateDoc.value?.metaData?.fileUuid || '',
-            endpoint: data.endpoint || currentSlateDoc.value?.metaData?.endpoint || '',
-            savesOnCloud: data.savesOnCloud || currentSlateDoc.value?.metaData?.savesOnCloud || false
-        }
+        currentSlateDoc.value.metaData = {  ...defaultSlateMetadata(), ...currentSlateDoc.value.metaData, ...data } satisfies SlateMetadata
     }
 
     const getCurrentSlateDoc = () => {
@@ -98,16 +93,7 @@ export const useSlateFile = () => {
         const page = pageMap.value.get(unref(pageUUID))
         if (!page) return
 
-        const newData: SlatePage = {
-            content: data.content || page.content || '<p></p>',
-            embeddedImages: data.embeddedImages || page.embeddedImages || [],
-            persistentData: data.persistentData || page.persistentData || null,
-            textType: data.textType || page.textType || 'html',
-            children: data.children || page.children || [],
-            name: data.name || page.name || 'Page',
-            icon: data.icon || page.icon || 'lucide:file',
-            uuid: data.uuid || page.uuid || useUUID()
-        } satisfies SlatePage
+        const newData: SlatePage = { ...defaultSlatePage(unref(pageUUID)), ...page, ...data } satisfies SlatePage
 
         Object.assign(page, newData)
     }
@@ -133,6 +119,10 @@ export const useSlateFile = () => {
 
         mapPages(currentSlateDoc.value.pages)
         invokeOnPageReindex()
+    }
+
+    const getCachedFlattenedPages = (): SlatePage[] => {
+        return pageMap.value.values().toArray()
     }
 
     const addChildPage = (parentUUID: string, newPage: SlatePage) => {
@@ -216,7 +206,7 @@ export const useSlateFile = () => {
                     optConfirmLabel: 'Yes, Discard My Changes',
                     async onConfirm() {
                         clearFile()
-                        currentSlateDoc.value = defaultSlateDocument(newPageUUID)
+                        currentSlateDoc.value = createDefaultSlateDocument(newPageUUID)
                         await navigateTo(`/document/${newPageUUID}`)
                         modal.close()
                     },
@@ -225,8 +215,7 @@ export const useSlateFile = () => {
             modal.open()
         } else {
             clearFile()
-            currentSlateDoc.value = defaultSlateDocument(newPageUUID)
-            currentSlateDoc.value.pages.push(defaultSlatePage(newPageUUID))
+            currentSlateDoc.value = createDefaultSlateDocument(newPageUUID)
             navigateTo(`/document/${newPageUUID}`)
         }
 
@@ -451,15 +440,6 @@ export const useSlateFile = () => {
         })
     }
 
-    // const createSlatePage = async (newPageUUID: string) => {
-    //     if (!isSaved.value) {
-    //         await useNoteSaver().saveNote()
-    //     }
-    //
-    //     currentSlateDoc.value?.pages.push(defaultSlatePage(newPageUUID))
-    //     navigateTo(`/document/${newPageUUID}`)
-    // }
-
     type PagePathNode = {
         uuid: string,
         name: string,
@@ -681,6 +661,7 @@ export const useSlateFile = () => {
         getPageParent,
         clearFile,
         subscribeOnPageReindex,
-        getPagesAsNodesAndEdges
+        getPagesAsNodesAndEdges,
+        getCachedFlattenedPages
     }
 }

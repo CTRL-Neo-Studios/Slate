@@ -1,19 +1,29 @@
-import type { SlateDocument, SlatePage } from '~/slate.types'
+import type { SlateConfig, SlateDocument, SlateDocumentConfig, SlateMetadata, SlatePage } from '~/slate.types'
 
-export const defaultSlateDocument = (pageUUID: string): SlateDocument => {
+export const defaultSlateMetadata = (): SlateMetadata => {
     return {
-        metaData: {
-            endpoint: '',
-            fileUuid: useUUID(),
-            savesOnCloud: false,
-            version: 2,
-        },
-        pages: []
-    }
+        endpoint: '',
+        fileUuid: useUUID(),
+        savesOnCloud: false,
+        version: 3,
+        config: defaultSlateDocumentConfig()
+    } satisfies SlateMetadata
 }
 
-export const defaultSlateDocumentUUID = (): SlateDocument => {
-    return defaultSlateDocument(useUUID())
+export const defaultSlateDocument = (): SlateDocument => {
+    return {
+        metaData: defaultSlateMetadata(),
+        pages: []
+    } satisfies SlateDocument
+}
+
+export const createDefaultSlateDocument = (initialUUID: string): SlateDocument => {
+    const doc: SlateDocument = {
+        metaData: defaultSlateMetadata(),
+        pages: []
+    }
+    doc.pages.push(defaultSlatePage(initialUUID))
+    return doc
 }
 
 export const defaultSlatePage = (pageUUID: string): SlatePage => {
@@ -27,6 +37,32 @@ export const defaultSlatePage = (pageUUID: string): SlatePage => {
         name: 'Page',
         children: []
     }
+}
+
+export const defaultSlateDocumentConfig = (): SlateDocumentConfig => {
+    return {
+        enabled: false,
+        customInstructions: 'You are Slate Curator, an AI that assists the users in using Slate, a rich-text tiptap-based note-taking app.',
+        lastEmbeddingUpdate: null,
+        embeddingCacheId: useUUID()
+    } satisfies SlateDocumentConfig
+}
+
+export const defaultSlateConfig = (): SlateConfig => {
+    return {
+        autosaveInterval: 5,
+        cacheTTL: 5,
+        chatModels: [],
+        embeddingModels: [],
+        colorTheme: 'zinc',
+        defaultEditorTheme: 'system',
+        confirmDestructiveActions: false,
+        maxCacheSize: 100,
+        functionCallingEnabled: true,
+        selectedChatModel: null,
+        selectedEmbeddingModel: null,
+        spellcheck: false,
+    } satisfies SlateConfig
 }
 
 /**
