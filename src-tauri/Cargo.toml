@@ -1,6 +1,6 @@
 [package]
 name = "Slate"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Tauri App"
 authors = ["Type-32", "CTRL Neo Studios"]
 license = "All Rights Reserved"
