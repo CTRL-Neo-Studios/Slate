@@ -12,6 +12,16 @@ const $route = useRoute()
 const routePageId = computed(() => $route.params.pageId as any as string)
 const props = defineProps<{currentPage?: string}>()
 
+defineShortcuts({
+    enter: {
+        usingInput: true,
+        handler: () => {
+            if (hasNodesSelected.value) return
+            toNodePage()
+        }
+    }
+})
+
 const data = reactive($slate.getPagesAsNodesAndEdges($slate.getFileName(), routePageId))
 function refreshGraphNodes(id: PossiblyRef<string>) {
     data.nodes = $slate.getPagesAsNodesAndEdges($slate.getFileName(), id).nodes
@@ -100,10 +110,16 @@ const handleCreatePage = async (mode: 'root' | 'current' | 'under') => {
 </script>
 
 <template>
-    <UModal :title="`Nodes View of ${$slate.getFileName()}`" description="The structured nodes view of the current document." fullscreen>
+    <UModal
+        :ui="{
+            body: 'p-0 sm:p-0'
+        }"
+        :title="`Nodes View of ${$slate.getFileName()}`"
+        description="The structured nodes view of the current document."
+        fullscreen>
         <template #body>
-            <div class="select-none w-full h-full">
-                <v-network-graph class="w-full h-full select-none" :nodes="data.nodes" :edges="data.edges" :configs="configs" v-model:selected-nodes="selectedNodes">
+            <div class="select-none w-full h-full p-0">
+                <v-network-graph class="w-full h-full select-none max-w-none max-h-none" :nodes="data.nodes" :edges="data.edges" :configs="configs" v-model:selected-nodes="selectedNodes">
                     <template #override-node="{ nodeId, scale, config, ...slotProps }">
                         <circle
                             :r="config.radius * scale"

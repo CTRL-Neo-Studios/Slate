@@ -1,7 +1,10 @@
 <script setup lang="ts">
-const name = ref('')
+
+const props = defineProps<{
+    initial?: string
+}>()
+const name = ref(props.initial || '')
 const $t = useToast()
-const input = ref()
 
 const emit = defineEmits(['confirm', 'close'])
 
@@ -58,8 +61,8 @@ const handleChangeIcon = (uuid: string) => {
         </template>
         <template #footer>
             <div class="flex gap-2 w-full justify-end items-center">
-                <UButton color="neutral" :label="'Cancel'" @click="closeModal()" />
-                <UButton color="warning" :label="'Confirm'" @click="onConfirm(name)" />
+                <UButton variant="soft" :label="'Cancel'" @click="closeModal()" />
+                <UButton :label="'Confirm'" @click="onConfirm(name)" />
             </div>
         </template>
     </UModal>

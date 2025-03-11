@@ -6,6 +6,7 @@ import { TableRow } from '@tiptap/extension-table-row'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { SearchAndReplace } from '@sereneinserenade/tiptap-search-and-replace'
+import { Mathematics } from '@tiptap-pro/extension-mathematics'
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
 import AutoJoiner from 'tiptap-extension-auto-joiner'
 import { TaskList } from '@tiptap/extension-task-list'
@@ -14,6 +15,7 @@ import type { Editor } from '@tiptap/vue-3'
 import type { ShallowRef } from '@vue/reactivity'
 import { Typography } from '@tiptap/extension-typography'
 import { StarterKit } from '@tiptap/starter-kit'
+import CalloutNode from '~/components/Slate/Editor/Prose/CalloutNode'
 
 export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any, ...extensions: any[]) => {
     return useEditor({
@@ -33,6 +35,8 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             SearchAndReplace,
             GlobalDragHandle,
             AutoJoiner,
+            Mathematics,
+            CalloutNode,
             // TaskList,
             // TaskItem.configure({
             //     HTMLAttributes: {

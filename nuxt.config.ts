@@ -31,7 +31,7 @@ export default defineNuxtConfig({
         prefix: 'Tiptap', //prefix for Tiptap imports, composables not included
     },
 
-    css: ['~/assets/css/main.css'],
+    css: ['~/assets/css/main.css', 'katex/dist/katex.min.css'],
 
     future: {
         compatibilityVersion: 4,

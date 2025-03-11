@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import {
     SlateModalDocumentInformation, SlateModalNodesView,
-    SlateModalPageRename,
-    SlateModalSelectIcon,
     SlateSlideoverPagesTree,
 } from '#components'
 
@@ -120,6 +118,8 @@ const buttonVariant = (toggled: boolean | undefined) => {
     return (toggled || false) ? 'subtle' : 'ghost'
 };
 
+const moreTools = ref(false)
+
 const boldToggled = computed(() => buttonVariant($editor.value?.isActive('bold')))
 const italicToggled = computed(() => buttonVariant($editor.value?.isActive('italic')))
 const strikeToggled = computed(() => buttonVariant($editor.value?.isActive('strike')))
@@ -127,7 +127,13 @@ const underlinedToggled = computed(() => buttonVariant($editor.value?.isActive('
 const codeToggled = computed(() => buttonVariant($editor.value?.isActive('code')))
 
 const insertTableRows = ref(2), insertTableCols = ref(2), insertTableHeaderRow = ref(true)
+const insertCalloutColor = ref('primary'), insertCalloutTitle = ref('Untitled'), insertCalloutIcon = ref('lucide:info'), insertCalloutVariant = ref('solid')
+const selectIconModalForCallout = $slateCommon.instantiateSelectIconModal((newIcon: string) => {
+    insertCalloutIcon.value = newIcon
+})
 
+const calloutColorsSelect = calloutColors()
+const calloutVariantsSelect = calloutVariants()
 const textStylesSelect = [
     {
         label: 'Paragraph',
@@ -271,50 +277,88 @@ function nodesView() {
                 <template v-if="showBottomBar">
                     <div class="w-full fixed bottom-0 left-0 right-0 h-fit z-10">
                         <div class="w-full flex items-center justify-start p-1 gap-1 select-none">
-                            <div class="w-fit flex items-center justify-start rounded-lg backdrop-blur-md p-1 gap-1 select-none">
-                                <USelect v-model="currentTextStyle" size="xs" :items="textStylesSelect"
-                                         :disabled="!$editor?.can().chain().focus().toggleHeading({level: 1}).run()"
-                                         @update:model-value="setStyle" />
-                                <UTooltip text="Bold" :kbds="['meta', 'B']">
-                                    <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
-                                             :disabled="!$editor?.can().chain().focus().toggleBold().run()"
-                                             @click="$editor?.chain().focus().toggleBold().run()"/>
-                                </UTooltip>
-                                <UButton icon="lucide:italic" size="xs" :variant="italicToggled"
-                                         :disabled="!$editor?.can().chain().focus().toggleItalic().run()"
-                                         @click="$editor?.chain().focus().toggleItalic().run()"/>
-                                <UButton icon="lucide:strikethrough" size="xs" :variant="strikeToggled"
-                                         :disabled="!$editor?.can().chain().focus().toggleStrike().run()"
-                                         @click="$editor?.chain().focus().toggleStrike().run()"/>
-                                <UButton icon="lucide:underline" size="xs" :variant="underlinedToggled"
-                                         :disabled="!$editor?.can().chain().focus().toggleUnderline().run()"
-                                         @click="$editor?.chain().focus().toggleUnderline().run()"/>
-                                <UButton icon="lucide:code" size="xs" :variant="codeToggled"
-                                         :disabled="!$editor?.can().chain().focus().toggleCode().run()"
-                                         @click="$editor?.chain().focus().toggleCode().run()"/>
-                                <UPopover>
-                                    <UButton icon="lucide:table" size="xs" variant="ghost"
-                                             :disabled="!$editor?.can().chain().focus().insertTable()"/>
-                                    <template #content>
-                                        <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
-                                            <div class="grid grid-cols-2 w-40 gap-2">
-                                                <UInputNumber size="xs" v-model="insertTableRows" :min="1"/>
-                                                <div class="text-xs flex items-center">Rows</div>
-                                                <UInputNumber size="xs" v-model="insertTableCols" :min="1"/>
-                                                <div class="text-xs flex items-center">Columns</div>
-                                                <USwitch size="xs" v-model="insertTableHeaderRow"/>
-                                                <div class="text-xs flex items-center">Header Row</div>
+                            <Transition class="transition-all duration-200" enter-active-class="blur-sm opacity-0" leave-active-class="blur-sm opacity-0">
+                                <div class="w-fit flex items-center justify-start rounded-lg backdrop-blur-md p-1 gap-1 select-none" v-if="!moreTools">
+                                    <USelect v-model="currentTextStyle" size="xs" :items="textStylesSelect"
+                                             :disabled="!$editor?.can().chain().focus().toggleHeading({level: 1}).run()"
+                                             @update:model-value="setStyle" />
+                                    <UTooltip text="Bold" :kbds="['meta', 'B']">
+                                        <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
+                                                 :disabled="!$editor?.can().chain().focus().toggleBold().run()"
+                                                 @click="$editor?.chain().focus().toggleBold().run()"/>
+                                    </UTooltip>
+                                    <UButton icon="lucide:italic" size="xs" :variant="italicToggled"
+                                             :disabled="!$editor?.can().chain().focus().toggleItalic().run()"
+                                             @click="$editor?.chain().focus().toggleItalic().run()"/>
+                                    <UButton icon="lucide:strikethrough" size="xs" :variant="strikeToggled"
+                                             :disabled="!$editor?.can().chain().focus().toggleStrike().run()"
+                                             @click="$editor?.chain().focus().toggleStrike().run()"/>
+                                    <UButton icon="lucide:underline" size="xs" :variant="underlinedToggled"
+                                             :disabled="!$editor?.can().chain().focus().toggleUnderline().run()"
+                                             @click="$editor?.chain().focus().toggleUnderline().run()"/>
+                                    <UButton icon="lucide:code" size="xs" :variant="codeToggled"
+                                             :disabled="!$editor?.can().chain().focus().toggleCode().run()"
+                                             @click="$editor?.chain().focus().toggleCode().run()"/>
+                                    <UPopover>
+                                        <UButton icon="lucide:table" size="xs" variant="ghost"
+                                                 :disabled="!$editor?.can().chain().focus().insertTable()"/>
+                                        <template #content>
+                                            <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
+                                                <div class="grid grid-cols-2 w-40 gap-2">
+                                                    <div class="text-xs flex items-center">Rows</div>
+                                                    <UInputNumber size="xs" v-model="insertTableRows" :min="1"/>
+                                                    <div class="text-xs flex items-center">Columns</div>
+                                                    <UInputNumber size="xs" v-model="insertTableCols" :min="1"/>
+                                                    <div class="text-xs flex items-center">Header Row</div>
+                                                    <USwitch size="xs" v-model="insertTableHeaderRow"/>
+                                                </div>
+                                                <UButton @click="$editor?.chain().focus().insertTable({ rows: insertTableRows, cols: insertTableCols, withHeaderRow: insertTableHeaderRow }).run()"
+                                                         size="xs" class="w-full justify-center items-center" label="Insert"/>
                                             </div>
-                                            <UButton @click="$editor?.chain().focus().insertTable({ rows: insertTableRows, cols: insertTableCols, withHeaderRow: insertTableHeaderRow }).run()"
-                                                     size="xs" class="w-full justify-center items-center" label="Insert"/>
-                                        </div>
-                                    </template>
-                                </UPopover>
-                            </div>
+                                        </template>
+                                    </UPopover>
+                                    <UTooltip text="More Actions..." :delay-duration="300">
+                                        <UButton icon="lucide:ellipsis" size="xs" variant="ghost"
+                                                 :disabled="!$editor"
+                                                 @click="moreTools = true"/>
+                                    </UTooltip>
+                                </div>
+                                <div class="w-fit flex items-center justify-start rounded-lg backdrop-blur-md p-1 gap-1 select-none" v-else>
+                                    <UTooltip text="Back" :delay-duration="300">
+                                        <UButton icon="lucide:chevron-left" size="xs"
+                                                 :disabled="!$editor"
+                                                 @click="moreTools = false"/>
+                                    </UTooltip>
+                                    <UPopover>
+                                        <UButton icon="lucide:rectangle-ellipsis" size="xs" variant="ghost"
+                                                 :disabled="!$editor"/>
+                                        <template #content>
+                                            <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
+                                                <div class="grid grid-cols-2 w-40 gap-2">
+                                                    <div class="text-xs flex items-center">Title</div>
+                                                    <UInput size="xs" v-model="insertCalloutTitle"/>
+                                                    <div class="text-xs flex items-center">Icon</div>
+                                                    <UButton size="xs" class="w-fit justify-self-end" :icon="insertCalloutIcon" @click="selectIconModalForCallout.open()"/>
+                                                    <div class="text-xs flex items-center">Color</div>
+                                                    <USelect size="xs" v-model="insertCalloutColor" :items="calloutColorsSelect"/>
+                                                    <div class="text-xs flex items-center">Variant</div>
+                                                    <USelect size="xs" v-model="insertCalloutVariant" :items="calloutVariantsSelect"/>
+                                                </div>
+                                                <UButton @click="() => {
+                                                    //@ts-ignore
+                                                    $editor?.chain().focus().setCallout({ icon: insertCalloutIcon, color: insertCalloutColor, title: insertCalloutTitle, variant: insertCalloutVariant }).run()
+                                                }"
+                                                         size="xs" class="w-full justify-center items-center" label="Insert"/>
+                                            </div>
+                                        </template>
+                                    </UPopover>
+                                </div>
+                            </Transition>
+
                             <div class="flex-grow -z-20"/>
                             <div class="w-fit flex items-center justify-end rounded-lg backdrop-blur-md p-1 gap-1 select-none">
                                 <UTooltip :text="documentInformation()" :delay-duration="200">
-                                    <UButton icon="lucide:ellipsis" size="xs" variant="ghost" @click="() => {
+                                    <UButton icon="lucide:info" size="xs" variant="ghost" @click="() => {
                                         slateDocInfoModal.open({
                                             wordCount: $editor?.storage.characterCount.words(),
                                             charCount: $editor?.storage.characterCount.characters()
@@ -322,7 +366,7 @@ function nodesView() {
                                     }"/>
                                 </UTooltip>
                                 <UTooltip :kbds="['meta', 'G']" text="Page Trees">
-                                    <UButton icon="lucide:menu" size="xs" variant="ghost" @click="() => {
+                                    <UButton icon="lucide:list-tree" size="xs" variant="ghost" @click="() => {
                                         pagesTree()
                                     }"/>
                                 </UTooltip>

@@ -40,6 +40,7 @@ export const useSlateCommon = () => {
 
         const pageRenameModal = $m.create(SlateModalPageRename, {
             props: {
+                initial: unref(currentName),
                 async onConfirm(newName: string) {
                     if (unref(currentName).trim()) {
                         $slate.setSavingFile(true)
@@ -125,10 +126,35 @@ export const useSlateCommon = () => {
         warningModal.open()
     }
 
+    const instantiateSelectIconModal = (callback: any) => {
+        const modal = $m.create(SlateModalSelectIcon, {
+            props: {
+                async onConfirm(newIcon: string) {
+                    if(callback != null) callback(newIcon)
+                    modal.close()
+                },
+            },
+        })
+        return modal
+    }
+
+    const convertToPlainTextWithSlate = (html: string[]) => {
+        const editor = useSlateEditor('', true, null)
+        let plain: string[] = []
+        for(const text of html) {
+            editor.value?.commands.setContent(text)
+            plain.push(editor.value?.getText() || '')
+        }
+        editor.value?.destroy()
+        return plain
+    }
+
     return {
         renamePage,
         changeIcon,
         createPage,
-        deletePage
+        deletePage,
+        instantiateSelectIconModal,
+        convertToPlainTextWithSlate
     }
 }

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { TreeItem, TreeRoot, TreeVirtualizer } from 'reka-ui'
 import type { SlatePage } from '~/slate.types'
-import { SlateModalPageRename, SlateModalSelectIcon, SlateModalWarning } from '#components'
 
 const props = defineProps<{pages: SlatePage[], currentPage: string}>()
 const emit = defineEmits(['close'])
