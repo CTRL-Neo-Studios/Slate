@@ -27,7 +27,7 @@ defineShortcuts({
 })
 
 onMounted(() => {
-    $appMenu.init($editor)
+    $appMenu.init()
 })
 
 onBeforeUnmount(() => {

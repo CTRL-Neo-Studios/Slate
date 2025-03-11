@@ -10,3 +10,7 @@ export type SlateSheetData = {
 export type SlateSheetBehavior = {
 
 }
+
+export type SlateDatabase = {
+
+}

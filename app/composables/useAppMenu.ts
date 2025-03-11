@@ -7,9 +7,12 @@ export const useAppMenu = () => {
     const $saver = useNoteSaver()
     const $export = useNoteExporter()
     const $slate = useSlateFile()
+    const $route = useRoute()
+
+    const isEditingDocument = computed(() => $route.fullPath.startsWith('/document'))
 
 
-    const init = async (editor: Ref<Editor | undefined>) => {
+    const init = async () => {
         try {
             const copy = await PredefinedMenuItem.new({
                 text: 'Copy',
@@ -92,26 +95,27 @@ export const useAppMenu = () => {
                         console.log('Save File');
                         await $saver.saveNote()
                     },
+                    enabled: isEditingDocument.value
                 },
-                separator,
-                {
-                    id: 'export-markdown',
-                    text: 'Export as Markdown',
-                    action: async () => {
-                        console.log('Export as Markdown');
-                        await $export.exportToMarkdown(editor)
-                        // Add logic for exporting to Markdown
-                    },
-                },
-                {
-                    id: 'export-pdf',
-                    text: 'Export as PDF',
-                    action: async () => {
-                        console.log('Export as PDF');
-                        await $export.exportToPDF(editor)
-                        // Add logic for exporting to PDF
-                    },
-                },
+                // separator,
+                // {
+                //     id: 'export-markdown',
+                //     text: 'Export as Markdown',
+                //     action: async () => {
+                //         console.log('Export as Markdown');
+                //         await $export.exportToMarkdown(editor)
+                //         // Add logic for exporting to Markdown
+                //     },
+                // },
+                // {
+                //     id: 'export-pdf',
+                //     text: 'Export as PDF',
+                //     action: async () => {
+                //         console.log('Export as PDF');
+                //         await $export.exportToPDF(editor)
+                //         // Add logic for exporting to PDF
+                //     },
+                // },
             ];
 
             // Define menu items for the "Edit" menu

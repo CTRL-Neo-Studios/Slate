@@ -1,8 +1,9 @@
-import type { SlateSheet } from '~/types/slate_sheet_types'
+import type { SlateDatabase, SlateSheet } from '~/types/slate_sheet.types'
 
 export type SlateDocument = {
     metaData: SlateMetadata,
-    pages: SlatePage[]
+    pages: SlatePage[],
+    databases?: SlateDatabase[]
 }
 
 export type SlatePage = {
@@ -14,7 +15,7 @@ export type SlatePage = {
     children: SlatePage[],
     name: string,
     icon: string,
-    sheet: SlateSheet | null,
+    sheet?: SlateSheet,
 }
 
 export type SlateMetadata = {
