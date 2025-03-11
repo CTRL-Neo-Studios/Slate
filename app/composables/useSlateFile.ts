@@ -1,6 +1,6 @@
-import type { SlateDocument, SlateMetadata, SlatePage } from '~/slate.types'
+import type { SlateDocument, SlateMetadata, SlatePage } from '~/types/slate.types'
 import { SlateModalWarning } from '#components'
-import type { PossiblyRef } from '~/utility.types'
+import type { PossiblyRef } from '~/types/utility.types'
 
 export const useSlateFile = () => {
     const $m = useOverlay(), $t = useToast()
@@ -624,6 +624,10 @@ export const useSlateFile = () => {
         return { nodes, edges };
     };
 
+    const isPageSheet = (pageUuid: PossiblyRef<string>) => {
+        return getCurrentSlatePage(pageUuid)?.sheet != null;
+    }
+
 
     return {
         getFilePath,
@@ -662,6 +666,7 @@ export const useSlateFile = () => {
         clearFile,
         subscribeOnPageReindex,
         getPagesAsNodesAndEdges,
-        getCachedFlattenedPages
+        getCachedFlattenedPages,
+        isPageSheet
     }
 }

@@ -6,7 +6,7 @@ import {
     type ForceNodeDatum,
     type ForceEdgeDatum,
 } from "v-network-graph/lib/force-layout"
-import type { PossiblyRef } from '~/utility.types'
+import type { PossiblyRef } from '~/types/utility.types'
 const $slate = useSlateFile()
 const $route = useRoute()
 const routePageId = computed(() => $route.params.pageId as any as string)

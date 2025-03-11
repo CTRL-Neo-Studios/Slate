@@ -3,7 +3,7 @@ import { writeTextFile, writeFile, create } from '@tauri-apps/plugin-fs';
 import type { Editor } from '@tiptap/vue-3'
 import { SlateModalWarning } from '#components'
 import { exit, relaunch } from '@tauri-apps/plugin-process';
-import type { SlateDocument } from '~/slate.types'
+import type { SlateDocument } from '~/types/slate.types'
 
 export const useNoteSaver = () => {
     const $slate = useSlateFile();

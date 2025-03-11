@@ -1,5 +1,5 @@
 import { SlateModalPageRename, SlateModalSelectIcon, SlateModalWarning } from '#components'
-import type { PossiblyRef } from '~/utility.types'
+import type { PossiblyRef } from '~/types/utility.types'
 
 export const useSlateCommon = () => {
     const $slate = useSlateFile()

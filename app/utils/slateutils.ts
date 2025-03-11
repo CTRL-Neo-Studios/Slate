@@ -1,4 +1,4 @@
-import type { SlateConfig, SlateDocument, SlateDocumentConfig, SlateMetadata, SlatePage } from '~/slate.types'
+import type { SlateConfig, SlateDocument, SlateDocumentConfig, SlateMetadata, SlatePage } from '~/types/slate.types'
 
 export const defaultSlateMetadata = (): SlateMetadata => {
     return {

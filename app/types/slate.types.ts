@@ -1,3 +1,5 @@
+import type { SlateSheet } from '~/types/slate_sheet_types'
+
 export type SlateDocument = {
     metaData: SlateMetadata,
     pages: SlatePage[]
@@ -12,6 +14,7 @@ export type SlatePage = {
     children: SlatePage[],
     name: string,
     icon: string,
+    sheet: SlateSheet | null,
 }
 
 export type SlateMetadata = {
@@ -44,7 +47,7 @@ export type SlateDocumentConfig = {
     customInstructions: string,
 }
 
-type ModelProvider = {
+export type ModelProvider = {
     id: string
     endpoint: string,
     chatSpecificEndpoint?: string,

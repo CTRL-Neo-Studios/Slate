@@ -3,7 +3,7 @@ import { readTextFile, readFile } from '@tauri-apps/plugin-fs';
 import type { Editor } from '@tiptap/vue-3'
 import { SlateModalWarning } from '#components'
 import {marked} from 'marked'
-import type { SlateDocument } from '~/slate.types'
+import type { SlateDocument } from '~/types/slate.types'
 
 export const useNoteImporter = () => {
     const $slate = useSlateFile()

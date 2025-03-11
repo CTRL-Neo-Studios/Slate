@@ -1,6 +1,6 @@
 // useSlateConfig.ts - full implementation
 import { BaseDirectory, exists, readTextFile, writeFile, mkdir } from '@tauri-apps/plugin-fs';
-import type { SlateConfig, SlateDocumentConfig, SlateDocument, SlateMetadata } from '~/slate.types'
+import type { SlateConfig, SlateDocumentConfig, SlateDocument, SlateMetadata } from '~/types/slate.types'
 
 export const useSlateConfig = () => {
     const configFilePath = 'slate_config.json';

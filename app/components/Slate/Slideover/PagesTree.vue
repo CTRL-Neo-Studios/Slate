@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TreeItem, TreeRoot, TreeVirtualizer } from 'reka-ui'
-import type { SlatePage } from '~/slate.types'
+import type { SlatePage } from '~/types/slate.types'
 
 const props = defineProps<{pages: SlatePage[], currentPage: string}>()
 const emit = defineEmits(['close'])
