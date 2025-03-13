@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Slate",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "identifier": "dev.ctrl-neo",
   "build": {
     "frontendDist": "../dist",
@@ -13,12 +13,11 @@
     "windows": [
       {
         "title": "Slate",
-        "width": 800,
+        "width": 900,
         "height": 600,
         "resizable": true,
         "fullscreen": false,
         "backgroundColor": null,
-        "transparent": true,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "windowEffects": {
@@ -31,7 +30,6 @@
         "dragDropEnabled": false
       }
     ],
-    "macOSPrivateApi": true,
     "security": {
       "csp": null
     }

@@ -38,7 +38,7 @@
 <style>
 .page-enter-active,
 .page-leave-active {
-    transition: all 0.25s;
+    transition: all 0.3s;
 }
 .page-enter-from,
 .page-leave-to {
@@ -48,7 +48,7 @@
 
 .layout-enter-active,
 .layout-leave-active {
-    transition: all 0.25s;
+    transition: all 0.3s;
 }
 .layout-enter-from,
 .layout-leave-to {

@@ -207,6 +207,7 @@ export const useSlateFile = () => {
                     async onConfirm() {
                         clearFile()
                         currentSlateDoc.value = createDefaultSlateDocument(newPageUUID)
+                        rebuildPageMap()
                         await navigateTo(`/document/${newPageUUID}`)
                         modal.close()
                     },
@@ -216,10 +217,9 @@ export const useSlateFile = () => {
         } else {
             clearFile()
             currentSlateDoc.value = createDefaultSlateDocument(newPageUUID)
+            rebuildPageMap()
             navigateTo(`/document/${newPageUUID}`)
         }
-
-        rebuildPageMap()
 
         return newPageUUID
     }

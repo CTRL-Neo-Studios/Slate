@@ -1,7 +1,7 @@
 [package]
 name = "Slate"
-version = "0.1.2"
-description = "A Tauri App"
+version = "0.2.0"
+description = "A simple rich-text notes-taking editor."
 authors = ["Type-32", "CTRL Neo Studios"]
 license = "All Rights Reserved"
 repository = "https://github.com/CTRL-Neo-Studios/Slate"
@@ -21,7 +21,7 @@ tauri-build = { version = "2.0.4", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
-tauri = { version = "2.2.4", features = ["macos-private-api"] }
+tauri = { version = "2.2.4", features = [] }
 tauri-plugin-log = "2.0.0-rc"
 tauri-plugin-os = "2"
 tauri-plugin-dialog = "2"
