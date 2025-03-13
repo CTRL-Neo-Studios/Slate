@@ -1,4 +1,3 @@
-// extensions/WikiLinkSuggestion.ts - Improved version
 import { Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { VueRenderer } from '@tiptap/vue-3'

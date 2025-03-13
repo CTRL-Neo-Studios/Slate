@@ -1,5 +1,3 @@
-// extensions/WikiLinkNode.ts - Updated version
-
 import { mergeAttributes, Node } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import WikiLink from '~/components/Slate/Editor/Prose/WikiLink.vue'
