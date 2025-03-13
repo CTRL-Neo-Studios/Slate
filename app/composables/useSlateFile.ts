@@ -1,6 +1,7 @@
 import type { SlateDocument, SlateMetadata, SlatePage } from '~/types/slate.types'
 import { SlateModalWarning } from '#components'
 import type { PossiblyRef } from '~/types/utility.types'
+import type { SlateSheet } from '~/types/slate_sheet.types'
 
 export const useSlateFile = () => {
     const $m = useOverlay(), $t = useToast()
@@ -122,7 +123,8 @@ export const useSlateFile = () => {
     }
 
     const getCachedFlattenedPages = (): SlatePage[] => {
-        return pageMap.value.values().toArray()
+        // Convert Map values iterator to an array
+        return Array.from(pageMap.value.values())
     }
 
     const addChildPage = (parentUUID: string, newPage: SlatePage) => {
@@ -628,6 +630,19 @@ export const useSlateFile = () => {
         return getCurrentSlatePage(pageUuid)?.sheet != null;
     }
 
+    const setPageSheet = (pageUuid: PossiblyRef<string>, data: Partial<SlateSheet>) => {
+        setSlatePageData(pageUuid, {
+            sheet: {
+                ...defaultSlateSheet(),
+                ...data
+            }
+        })
+    }
+
+    const getPageSheet = (pageUuid: PossiblyRef<string>) => {
+        return getCurrentSlatePage(pageUuid)?.sheet;
+    }
+
 
     return {
         getFilePath,
@@ -667,6 +682,8 @@ export const useSlateFile = () => {
         subscribeOnPageReindex,
         getPagesAsNodesAndEdges,
         getCachedFlattenedPages,
-        isPageSheet
+        isPageSheet,
+        setPageSheet,
+        getPageSheet
     }
 }

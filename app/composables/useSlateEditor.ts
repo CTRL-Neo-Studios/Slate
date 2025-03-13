@@ -16,8 +16,14 @@ import type { ShallowRef } from '@vue/reactivity'
 import { Typography } from '@tiptap/extension-typography'
 import { StarterKit } from '@tiptap/starter-kit'
 import CalloutNode from '~/components/Slate/Editor/Prose/CalloutNode'
+import WikiLinkNode from '~/components/Slate/Editor/Prose/WikiLinkNode'
+import WikiLinkSuggestion from '~/components/Slate/Editor/Prose/WikiLinkSuggestion'
 
 export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any, ...extensions: any[]) => {
+
+    const suggestionElement = ref<HTMLElement | null>(null)
+    let suggestionApp: any = null
+
     return useEditor({
         content: initialContent,
         editable,
@@ -37,6 +43,10 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             AutoJoiner,
             Mathematics,
             CalloutNode,
+            WikiLinkNode,
+            WikiLinkSuggestion,
+            // WikiLinkNode,
+            // WikiLinkSuggestion,
             // TaskList,
             // TaskItem.configure({
             //     HTMLAttributes: {

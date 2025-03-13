@@ -1,5 +1,6 @@
 import type { SlateConfig, SlateDocument, SlateDocumentConfig, SlateMetadata, SlatePage } from '~/types/slate.types'
 import { undefined } from 'zod'
+import type { SlateSheet } from '~/types/slate_sheet.types'
 
 export const defaultSlateMetadata = (): SlateMetadata => {
     return {
@@ -65,6 +66,15 @@ export const defaultSlateConfig = (): SlateConfig => {
         spellcheck: false,
     } satisfies SlateConfig
 }
+
+export const defaultSlateSheet = (): SlateSheet => {
+    return {
+        connections: [],
+        instances: [],
+    } satisfies SlateSheet
+}
+
+
 
 export function calloutColors() {
     return [

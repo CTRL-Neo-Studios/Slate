@@ -1,7 +1,4 @@
 export type SlateSheet = {
-    data: SlateSheetData,
-    behavior: SlateSheetBehavior,
-    schemas: ComponentSchema[], // Component type definitions
     instances: ComponentInstance[], // Actual component instances
     connections: ComponentConnection[] // Wiring between components/nodes
 }

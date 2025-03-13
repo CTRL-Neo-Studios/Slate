@@ -5,7 +5,7 @@ export type SlateButtonComponent = ComponentInstance & {
     config: ComponentConfig & {
         label: string,
         icon: string,
-        variant: 'primary' | 'secondary',
+        variant: 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | undefined,
     }
 }
 
@@ -13,6 +13,7 @@ export type SlateInputComponent = ComponentInstance & {
     config: ComponentConfig & {
         placeholder: string,
         value: string,
+        variant: 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | undefined,
     }
 }
 
