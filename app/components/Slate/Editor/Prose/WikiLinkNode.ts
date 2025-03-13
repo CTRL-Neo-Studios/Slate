@@ -66,8 +66,10 @@ export default Node.create({
         return VueNodeViewRenderer(WikiLink)
     },
 
+    //@ts-ignore
     addCommands() {
         return {
+            //@ts-ignore
             setWikiLink: (attributes) => ({ commands }) => {
                 return commands.insertContent({
                     type: this.name,
@@ -104,7 +106,7 @@ export default Node.create({
                                 const startPos = from - (match[0].length - 1)
 
                                 // Extract page title and optional display text
-                                const pageTitle = match[1].trim()
+                                const pageTitle = match[1]?.trim()
                                 const displayText = match[2]?.trim() || pageTitle
 
                                 // Skip if we don't have a valid page title

@@ -95,8 +95,8 @@ export default Extension.create({
                 },
 
                 view() {
-                    let component = null
-                    let tippyInstance = null
+                    let component: any = null
+                    let tippyInstance: any = null
 
                     return {
                         update(view, prevState) {
@@ -130,7 +130,7 @@ export default Extension.create({
                             const searchQuery = state.query?.toLowerCase() || ''
 
                             // Get all pages for suggestions
-                            let pages = []
+                            let pages: any[] = []
                             try {
                                 pages = slateFile.getCachedFlattenedPages ?
                                     slateFile.getCachedFlattenedPages() :
@@ -211,6 +211,7 @@ export default Extension.create({
                                     editor,
                                     props: {
                                         items: limitedResults,
+                                        //@ts-ignore
                                         command: ({ id, title }) => {
                                             if (state.range) {
                                                 view.dispatch(
@@ -235,6 +236,7 @@ export default Extension.create({
                                         editor,
                                     },
                                     // Correctly handle "close" event
+                                    //@ts-ignore
                                     onCreate: ({ on }) => {
                                         if (typeof on === 'function') {
                                             on('close', destroyComponent)
