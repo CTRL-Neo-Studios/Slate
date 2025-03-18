@@ -9,6 +9,7 @@ export const useNoteSaver = () => {
     const $slate = useSlateFile();
     const $t = useToast();
     const $m = useOverlay()
+    const $config = useSlateConfig()
 
     let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -79,7 +80,7 @@ export const useNoteSaver = () => {
         autoSaveTimeout = setTimeout(async () => {
             console.log('Auto-saving note...');
             await saveNote(); // Call the saveNote function
-        }, 5000); // 5 seconds delay
+        }, $config.getGlobalConfig().autosaveInterval * 1000); // 5 seconds delay
     };
 
     const saveBeforeQuit = () => {

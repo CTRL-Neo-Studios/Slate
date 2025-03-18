@@ -18,8 +18,10 @@ import { StarterKit } from '@tiptap/starter-kit'
 import CalloutNode from '~/components/Slate/Editor/Prose/CalloutNode'
 import WikiLinkNode from '~/components/Slate/Editor/Prose/WikiLinkNode'
 import WikiLinkSuggestion from '~/components/Slate/Editor/Prose/WikiLinkSuggestion'
+import CardNode from '~/components/Slate/Editor/Prose/CardNode'
+import AccordionNode from '~/components/Slate/Editor/Prose/AccordionNode'
 
-export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any, ...extensions: any[]) => {
+export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any = null, ...extensions: any[]) => {
 
     const suggestionElement = ref<HTMLElement | null>(null)
     let suggestionApp: any = null
@@ -43,10 +45,10 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             AutoJoiner,
             Mathematics,
             CalloutNode,
+            CardNode,
+            AccordionNode,
             WikiLinkNode,
             WikiLinkSuggestion,
-            // WikiLinkNode,
-            // WikiLinkSuggestion,
             // TaskList,
             // TaskItem.configure({
             //     HTMLAttributes: {
@@ -56,7 +58,8 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             ...extensions
         ],
         onUpdate() {
-            onUpdateCallback();
+            if (onUpdateCallback != null)
+                onUpdateCallback();
         }
     });
 }

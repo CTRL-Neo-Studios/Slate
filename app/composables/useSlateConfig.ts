@@ -1,11 +1,24 @@
 // useSlateConfig.ts - full implementation
 import { BaseDirectory, exists, readTextFile, writeFile, mkdir } from '@tauri-apps/plugin-fs';
 import type { SlateConfig, SlateDocumentConfig, SlateDocument, SlateMetadata } from '~/types/slate.types'
+import type { PossiblyRef } from '~/types/utility.types'
+import { SlateModalWarning } from '#components'
 
 export const useSlateConfig = () => {
+    const $o = useOverlay()
     const configFilePath = 'slate_config.json';
     const globalConfig = useState<SlateConfig>('globalSlateConfig', () => defaultSlateConfig());
     const globalConfigLoaded = useState<boolean>('globalConfigLoaded', () => false);
+    const lastPage = useState<string>('lastRoutedPage', () => '')
+
+    async function openConfig(from: PossiblyRef<string>) {
+        lastPage.value = unref(from)
+        await navigateTo('/settings')
+    }
+
+    async function closeConfig() {
+        await navigateTo(lastPage.value)
+    }
 
     /**
      * Initialize global configuration from disk
@@ -56,6 +69,7 @@ export const useSlateConfig = () => {
             const data = encoder.encode(configJson);
 
             await writeFile(configFilePath, data, { baseDir: BaseDirectory.AppConfig });
+            applyConfigEffects()
             return true;
         } catch (error) {
             console.error('Error saving config:', error);
@@ -77,8 +91,11 @@ export const useSlateConfig = () => {
     /**
      * Get current global configuration
      */
-    function getGlobalConfig(): Readonly<Ref<SlateConfig>> {
-        return globalConfig;
+    function getGlobalConfig(): SlateConfig {
+        return {
+            ...defaultSlateConfig(),
+            ...globalConfig.value
+        } satisfies SlateConfig;
     }
 
     /**
@@ -159,6 +176,13 @@ export const useSlateConfig = () => {
         };
     }
 
+    function applyConfigEffects() {
+        if (!isGlobalConfigLoaded()) return
+        useColorMode().preference = getGlobalConfig().defaultEditorTheme
+        useAppConfig().ui.colors.primary = getGlobalConfig().colorTheme
+        useAppConfig().ui.colors.neutral = getGlobalConfig().backgroundTheme
+    }
+
     return {
         initGlobalConfig,
         saveGlobalConfig,
@@ -169,5 +193,8 @@ export const useSlateConfig = () => {
         resetDocumentConfig,
         isGlobalConfigLoaded,
         getCombinedConfig,
+        openConfig,
+        closeConfig,
+        applyConfigEffects
     };
 };

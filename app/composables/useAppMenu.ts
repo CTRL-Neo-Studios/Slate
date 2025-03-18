@@ -1,170 +1,210 @@
-import { Menu, Submenu, MenuItem, PredefinedMenuItem, CheckMenuItem, IconMenuItem, type MenuItemOptions, type SubmenuOptions, type IconMenuItemOptions, type PredefinedMenuItemOptions, type CheckMenuItemOptions } from '@tauri-apps/api/menu'
+import { Menu, Submenu, MenuItem, PredefinedMenuItem, CheckMenuItem, IconMenuItem } from '@tauri-apps/api/menu'
 import type { Editor } from '@tiptap/vue-3'
 
-type MenuTypes = (Submenu | MenuItem | PredefinedMenuItem | CheckMenuItem | IconMenuItem | MenuItemOptions | SubmenuOptions | IconMenuItemOptions | PredefinedMenuItemOptions | CheckMenuItemOptions)
 export const useAppMenu = () => {
     const $import = useNoteImporter()
     const $saver = useNoteSaver()
     const $export = useNoteExporter()
     const $slate = useSlateFile()
+    const $config = useSlateConfig()
     const $route = useRoute()
+    const previousRoute = useState<string>(() => '')
 
     const isEditingDocument = computed(() => $route.fullPath.startsWith('/document'))
 
-
     const init = async () => {
         try {
+            // Create predefined menu items
             const copy = await PredefinedMenuItem.new({
                 text: 'Copy',
                 item: 'Copy',
-            });
+            })
 
             const separator = await PredefinedMenuItem.new({
                 text: 'separator-text',
                 item: 'Separator',
-            });
+            })
 
             const undo = await PredefinedMenuItem.new({
                 text: 'Undo',
                 item: 'Undo',
-            });
+            })
 
             const redo = await PredefinedMenuItem.new({
                 text: 'Redo',
                 item: 'Redo',
-            });
+            })
 
             const cut = await PredefinedMenuItem.new({
                 text: 'Cut',
                 item: 'Cut',
-            });
+            })
 
             const paste = await PredefinedMenuItem.new({
                 text: 'Paste',
                 item: 'Paste',
-            });
+            })
 
-            const select_all = await PredefinedMenuItem.new({
+            const selectAll = await PredefinedMenuItem.new({
                 text: 'Select All',
                 item: 'SelectAll',
-            });
+            })
 
-            const slateMenu: MenuTypes[] = [
-                {
-                    id: 'settings',
-                    text: 'Settings',
-                    accelerator: 'CommandOrControl+,',
-                    action: async () => {
+            // Create Slate menu items
+            const settingsItem = await MenuItem.new({
+                id: 'settings',
+                text: 'Settings...',
+                accelerator: 'CommandOrControl+,',
+                action: async () => {
+                    await $config.openConfig($route.fullPath)
+                },
+            })
 
-                    },
+            const quitItem = await MenuItem.new({
+                id: 'quit',
+                text: 'Quit',
+                accelerator: 'CommandOrControl+Q',
+                action: async () => {
+                    $saver.saveBeforeQuit()
                 },
-                separator,
-                {
-                    id: 'quit',
-                    text: 'Quit',
-                    accelerator: 'CommandOrControl+Q',
-                    action: async () => {
-                        $saver.saveBeforeQuit()
-                    },
-                },
-            ]
-            const fileMenu: MenuTypes[] = [
-                {
-                    id: 'new',
-                    text: 'New',
-                    accelerator: 'CommandOrControl+N',
-                    action: async () => {
-                        console.log('New File');
-                        $slate.createSlateDocument()
-                    },
-                },
-                {
-                    id: 'open',
-                    text: 'Open...',
-                    accelerator: 'CommandOrControl+O',
-                    action: async () => {
-                        console.log('Open File');
-                        await $import.importNote()
-                    },
-                },
-                {
-                    id: 'save',
-                    text: 'Save',
-                    accelerator: 'CommandOrControl+S',
-                    action: async () => {
-                        console.log('Save File');
-                        await $saver.saveNote()
-                    },
-                    enabled: isEditingDocument.value
-                },
-                // separator,
-                // {
-                //     id: 'export-markdown',
-                //     text: 'Export as Markdown',
-                //     action: async () => {
-                //         console.log('Export as Markdown');
-                //         await $export.exportToMarkdown(editor)
-                //         // Add logic for exporting to Markdown
-                //     },
-                // },
-                // {
-                //     id: 'export-pdf',
-                //     text: 'Export as PDF',
-                //     action: async () => {
-                //         console.log('Export as PDF');
-                //         await $export.exportToPDF(editor)
-                //         // Add logic for exporting to PDF
-                //     },
-                // },
-            ];
+            })
 
-            // Define menu items for the "Edit" menu
-            const editMenu: MenuTypes[] = [
-                copy, paste, cut, select_all, separator, undo, redo,
-            ];
+            // Create File menu items
+            const newFileItem = await MenuItem.new({
+                id: 'new',
+                text: 'New',
+                accelerator: 'CommandOrControl+N',
+                action: async () => {
+                    console.log('New File')
+                    $slate.createSlateDocument()
+                },
+            })
 
-            // Create the main menu
+            const openFileItem = await MenuItem.new({
+                id: 'open',
+                text: 'Open...',
+                accelerator: 'CommandOrControl+O',
+                action: async () => {
+                    console.log('Open File')
+                    await $import.importNote()
+                },
+            })
+
+            const saveFileItem = await MenuItem.new({
+                id: 'save',
+                text: 'Save',
+                accelerator: 'CommandOrControl+S',
+                action: async () => {
+                    console.log('Save File')
+                    await $saver.saveNote()
+                },
+                enabled: isEditingDocument.value
+            })
+
+            // Uncomment and adjust these if you want to include export functionality
+            /*
+            const exportMarkdownItem = await MenuItem.new({
+                id: 'export-markdown',
+                text: 'Export as Markdown',
+                action: async () => {
+                    console.log('Export as Markdown')
+                    await $export.exportToMarkdown(editor)
+                },
+                enabled: isEditingDocument.value
+            })
+
+            const exportPdfItem = await MenuItem.new({
+                id: 'export-pdf',
+                text: 'Export as PDF',
+                action: async () => {
+                    console.log('Export as PDF')
+                    await $export.exportToPDF(editor)
+                },
+                enabled: isEditingDocument.value
+            })
+            */
+
+            // Assemble menu sections
+            const slateSubmenu = await Submenu.new({
+                id: 'main',
+                text: 'Slate',
+                items: [
+                    settingsItem,
+                    separator,
+                    quitItem,
+                ],
+            })
+
+            const fileSubmenu = await Submenu.new({
+                id: 'file',
+                text: 'File',
+                items: [
+                    newFileItem,
+                    openFileItem,
+                    saveFileItem,
+                    // Uncomment if using export functionality
+                    // separator,
+                    // exportMarkdownItem,
+                    // exportPdfItem,
+                ],
+            })
+
+            const editSubmenu = await Submenu.new({
+                id: 'edit',
+                text: 'Edit',
+                items: [
+                    copy,
+                    paste,
+                    cut,
+                    selectAll,
+                    separator,
+                    undo,
+                    redo,
+                ],
+            })
+
+            // Optional: You can add these other submenus if needed
+            /*
+            const viewSubmenu = await Submenu.new({
+                id: 'view',
+                text: 'View',
+                items: [],
+            })
+
+            const windowSubmenu = await Submenu.new({
+                id: 'window',
+                text: 'Window',
+                items: [],
+            })
+
+            const helpSubmenu = await Submenu.new({
+                id: 'help',
+                text: 'Help',
+                items: [],
+            })
+            */
+
+            // Create and set the application menu
             const menu = await Menu.new({
                 items: [
-                    {
-                        id: 'main',
-                        text: 'Slate',
-                        items: slateMenu,
-                    },
-                    {
-                        id: 'file',
-                        text: 'File',
-                        items: fileMenu,
-                    },
-                    {
-                        id: 'edit',
-                        text: 'Edit',
-                        items: editMenu,
-                    },
-                    // {
-                    //     id: 'view',
-                    //     text: 'View',
-                    //     items: [], // Empty View menu
-                    // },
-                    // {
-                    //     id: 'window',
-                    //     text: 'Window',
-                    //     items: [], // Empty Window menu
-                    // },
-                    // {
-                    //     id: 'help',
-                    //     text: 'Help',
-                    //     items: [], // Empty Help menu
-                    // },
+                    slateSubmenu,
+                    fileSubmenu,
+                    editSubmenu,
+                    // Uncomment if using these optional submenus
+                    // viewSubmenu,
+                    // windowSubmenu,
+                    // helpSubmenu,
                 ],
-            });
+            })
 
-            // Set the menu as the app menu
-            await menu.setAsAppMenu();
-            console.log('Menu set successfully');
+            // Set as application menu
+            await menu.setAsAppMenu()
+            previousRoute.value = $route.fullPath
+            console.log('Menu set successfully')
         } catch (error) {
-            console.error('Error setting up app menu:', error);
+            console.error('Error setting up app menu:', error)
         }
     }
-    return {init}
-};
+
+    return { init }
+}

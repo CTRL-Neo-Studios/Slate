@@ -57,6 +57,7 @@ export const defaultSlateConfig = (): SlateConfig => {
         chatModels: [],
         embeddingModels: [],
         colorTheme: 'zinc',
+        backgroundTheme: 'zinc',
         defaultEditorTheme: 'system',
         confirmDestructiveActions: false,
         maxCacheSize: 100,
@@ -76,7 +77,7 @@ export const defaultSlateSheet = (): SlateSheet => {
 
 
 
-export function calloutColors() {
+export function themeVariableColors() {
     return [
         {
             label: 'Primary',
@@ -289,7 +290,7 @@ export function themeColors() {
     ]
 }
 
-export function calloutVariants() {
+export function themeVariableVariants() {
     return [
         {
             label: 'Solid',

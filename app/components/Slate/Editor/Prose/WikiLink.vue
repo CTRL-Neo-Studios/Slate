@@ -50,21 +50,13 @@ const linkText = computed(() => {
     }
 
     // If not valid, use pageId as text (which may be a title that doesn't match a page)
-    return pageId.value
+    return 'Undefined Page'
 })
 
 // Navigate to the linked page
 function navigateToPage() {
     if (isValid.value && pageId.value) {
         router.push(`/document/${pageId.value}`)
-    } else if (pageId.value) {
-        // Create a new page with title matching the link text
-        const newPageId = useUUID()
-        $t.add({
-            title: 'Cannot open referred page; Page has either been deleted or cannot be referenced.',
-            icon: 'lucide:circle-x',
-            color: 'error'
-        })
     }
 }
 </script>
@@ -72,33 +64,20 @@ function navigateToPage() {
 <template>
     <NodeViewWrapper
         as="a"
-        :class="[
-      'wiki-link',
-      { 'wiki-link--valid': isValid, 'wiki-link--invalid': !isValid }
-    ]"
+        :class="['wiki-link inline-flex items-center rounded px-0.5 gap-0.5', isValid ? '' : 'text-error-400 not-prose']"
         @click.prevent="navigateToPage"
         :data-tooltip="pagePath ? `Located in: ${pagePath}` : undefined"
     >
         <UIcon
             :name="isValid ? linkedPage?.icon || 'lucide:file' : 'lucide:file-question'"
-            class="wiki-link__icon"
+            class="size-3"
         />
         {{ linkText }}
     </NodeViewWrapper>
 </template>
 
 <style>
-.wiki-link {
-    color: var(--primary);
-    text-decoration: underline;
-    cursor: pointer;
-    border-radius: 0.25rem;
-    padding: 0 2px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    position: relative;
-}
+@reference "~/assets/css/main.css";
 
 .wiki-link:hover {
     background-color: var(--primary-100);
@@ -127,11 +106,6 @@ function navigateToPage() {
     opacity: 1;
 }
 
-.wiki-link--invalid {
-    color: var(--warning);
-    text-decoration: dashed underline;
-}
-
 .wiki-link__icon {
     width: 0.875rem;
     height: 0.875rem;
@@ -140,8 +114,12 @@ function navigateToPage() {
 
 /* For highlighting wiki link syntax while typing */
 .wiki-link-syntax {
-    background-color: rgba(var(--primary-500), 0.1);
+    background-color: rgba(var(--ui-primary), 0.1);
     border-radius: 0.25rem;
+}
+
+.ProseMirror-selectednode {
+    @apply ring-(--ui-primary) ring-2
 }
 </style>
 

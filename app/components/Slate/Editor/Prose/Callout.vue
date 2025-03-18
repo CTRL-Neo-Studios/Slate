@@ -1,4 +1,3 @@
-<!-- components/Amulet/Prose/Callout.vue -->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3'
 
@@ -8,11 +7,6 @@ const color = ref<'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warn
 const title = ref('Callout')
 const icon = ref('lucide:info')
 const variant = ref('solid')
-
-const borderColor = computed(() => {
-    if (color.value === 'primary') return 'var(--primary)'
-    return `var(--${color.value}-400)`
-})
 
 onMounted(() => {
     color.value = props.node.attrs.color
@@ -24,8 +18,8 @@ onMounted(() => {
 
 <template>
     <node-view-wrapper class="my-4 w-full">
-        <UAlert :title :color :icon :variant>
-            <template #description class="prose dark:prose-invert prose-sm">
+        <UAlert :title :icon>
+            <template #description class="custom-prose">
                 <NodeViewContent style="width: 100%"/>
             </template>
         </UAlert>
@@ -33,4 +27,7 @@ onMounted(() => {
 </template>
 
 <style>
+.ProseMirror-selectednode {
+    @apply ring-(--ui-primary) ring-2
+}
 </style>

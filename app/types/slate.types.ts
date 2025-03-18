@@ -1,9 +1,8 @@
-import type { SlateDatabase, SlateSheet } from '~/types/slate_sheet.types'
+import type { SlateSheet } from '~/types/slate_sheet.types'
 
 export type SlateDocument = {
     metaData: SlateMetadata,
-    pages: SlatePage[],
-    databases?: SlateDatabase[]
+    pages: SlatePage[]
 }
 
 export type SlatePage = {
@@ -28,6 +27,7 @@ export type SlateMetadata = {
 
 export type SlateConfig = {
     colorTheme: 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose' | 'zinc',
+    backgroundTheme: 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone',
     embeddingModels: ModelProvider[],
     chatModels: ModelProvider[],
     selectedEmbeddingModel: string | null,
