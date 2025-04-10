@@ -4,7 +4,7 @@ export default defineNuxtConfig({
         pageTransition: { name: 'page', mode: 'out-in' },
         layoutTransition: { name: 'layout', mode: 'out-in' }
     },
-    devtools: { enabled: true },
+    devtools: { enabled: false },
     // Enable SSG
     ssr: false,
     // Enables the development server to be discoverable by other devices when running on iOS physical devices
@@ -20,6 +20,11 @@ export default defineNuxtConfig({
             // Tauri requires a consistent port
             strictPort: true,
         },
+        resolve: {
+            alias: {
+                'html2canvas': 'html2canvas-pro'
+            }
+        }
     },
 
     modules: [

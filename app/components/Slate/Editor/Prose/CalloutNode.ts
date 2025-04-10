@@ -6,7 +6,7 @@ export default Node.create({
     name: 'callout',
     group: 'block',
 
-    content: 'block+',
+    content: 'inline*',
     draggable: true,
 
     addAttributes() {
@@ -21,7 +21,7 @@ export default Node.create({
                 default: 'lucide:info'
             },
             variant: {
-                default: 'solid'
+                default: 'subtle'
             }
         }
     },
@@ -61,15 +61,9 @@ export default Node.create({
                         title: options.title || 'Note',
                         color: options.color || 'primary',
                         icon: options.icon || 'lucide:info',
-                        variant: options.variant || 'solid',
+                        variant: options.variant || 'subtle',
                     },
-                    content: [{
-                        type: 'paragraph',
-                        content: [{
-                            type: 'text',
-                            text: 'text'
-                        }]
-                    }]
+                    content: ''
                 })
             },
         }

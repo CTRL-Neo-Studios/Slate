@@ -90,7 +90,7 @@ const hasNodesSelected = computed(() => selectedNodes.value.length <= 0 || selec
 function toNodePage() {
     if (selectedNodes.value[0] == 'root_node' || selectedNodes.value[0] == '')
         return
-    navigateTo(`/document/${selectedNodes.value[0] || ''}`)
+    $slateCommon.toPage(selectedNodes.value[0] || '')
     // closeModal()
 }
 

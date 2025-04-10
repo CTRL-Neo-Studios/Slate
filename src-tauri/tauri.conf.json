@@ -68,6 +68,15 @@
         "name": "sdf",
         "role": "Editor",
         "mimeType": "text/sdf"
+      },
+      {
+        "ext": [
+          "sdx"
+        ],
+        "description": "The Slate Document Extended Format.",
+        "name": "sdx",
+        "role": "Editor",
+        "mimeType": "text/sdx"
       }
     ]
   }

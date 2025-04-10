@@ -1,9 +1,10 @@
 export default defineAppConfig({
     // https://ui3.nuxt.dev/getting-started/theme#design-system
     ui: {
-        colors: {
-            primary: 'zinc',
-            neutral: 'zinc',
-        },
+        toast: {
+            slots: {
+                root: 'print:hidden'
+            }
+        }
     },
 })

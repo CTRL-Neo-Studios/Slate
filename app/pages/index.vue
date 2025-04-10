@@ -3,10 +3,12 @@ const $slate = useSlateFile()
 const $import = useNoteImporter()
 const $config = useSlateConfig()
 const $route = useRoute()
+const $appMenu = useAppMenu()
 const configLoaded = computed(() => $config.isGlobalConfigLoaded())
 
 onMounted(async () => {
     await $config.initGlobalConfig()
+    await $appMenu.init()
 })
 
 function createDoc() {
@@ -23,7 +25,7 @@ async function openSettings() {
 </script>
 <template>
     <div>
-        <Transition class="transition-all duration-200 h-fit w-fit" enter-active-class="blur-sm opacity-0" leave-active-class="blur-sm opacity-0">
+        <Transition class="transition-all duration-500 h-fit w-fit" enter-active-class="blur-sm opacity-0" leave-active-class="blur-sm opacity-0">
             <div v-if="configLoaded" class="w-full min-h-screen flex flex-col items-center justify-center prose max-w-none dark:prose-invert">
                 <h1 class="mb-0">Welcome to Slate👋</h1>
                 <p>We hope you enjoy the ride 😊~</p>

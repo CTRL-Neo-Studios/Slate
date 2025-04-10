@@ -6,21 +6,21 @@ const props = defineProps(nodeViewProps)
 const color = ref<'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral' | string | undefined>('primary')
 const title = ref('Callout')
 const icon = ref('lucide:info')
-const variant = ref('solid')
+const variant = ref('subtle')
 
 onMounted(() => {
     color.value = props.node.attrs.color
     title.value = props.node.attrs.title
     icon.value = props.node.attrs.icon
-    variant.value = props.node.attrs.variant
+    variant.value = "solid"
 })
 </script>
 
 <template>
-    <node-view-wrapper class="my-4 w-full">
-        <UAlert :title :icon>
-            <template #description class="custom-prose">
-                <NodeViewContent style="width: 100%"/>
+    <node-view-wrapper class="my-4 w-full draggable-item dom">
+        <UAlert :color :variant="'solid'" :title :icon>
+            <template #description>
+                <NodeViewContent style="width: 100%" class="content-dom text-sm"/>
             </template>
         </UAlert>
     </node-view-wrapper>
