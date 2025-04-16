@@ -31,6 +31,7 @@ const handleDelete = (uuid: string, recursive: boolean) => {
 
 const handleCreatePage = async (mode: 'root' | 'current' | 'under', targetPageUUID: string) => {
     await $slateCommon.createPage(mode, targetPageUUID)
+    closeSlideover()
 }
 
 const handleChangeIcon = (uuid: string) => {
@@ -129,7 +130,7 @@ function closeSlideover() {
                             :label="item.value.name"
                             size="sm"
                             @click="() => {
-                                navigateTo(`/document/${item.value.uuid}`)
+                                $slateCommon.toPage(item.value.uuid)
                                 closeSlideover()
                             }"
                         />

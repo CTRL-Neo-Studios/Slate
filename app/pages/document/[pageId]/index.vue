@@ -1,16 +1,13 @@
 <script setup lang="ts">
-
 definePageMeta({
-    layout: 'pages-directory'
+    layout: 'pages-directory',
 })
-
 </script>
 
 <template>
     <div>
-        <SlateEditorText/>
+        <SlateEditorText />
     </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

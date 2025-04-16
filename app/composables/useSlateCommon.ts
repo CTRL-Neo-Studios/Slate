@@ -149,12 +149,19 @@ export const useSlateCommon = () => {
         return plain
     }
 
+    function toPage(pageUuid: PossiblyRef<string>) {
+        if(unref($slate.getCurrentSlateDoc()) != null)
+            $slate.addTab(pageUuid)
+        return navigateTo(`/document/${unref(pageUuid)}`)
+    }
+
     return {
         renamePage,
         changeIcon,
         createPage,
         deletePage,
         instantiateSelectIconModal,
-        convertToPlainTextWithSlate
+        convertToPlainTextWithSlate,
+        toPage
     }
 }

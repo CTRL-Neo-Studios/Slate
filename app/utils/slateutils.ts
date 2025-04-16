@@ -1,5 +1,4 @@
 import type { SlateConfig, SlateDocument, SlateDocumentConfig, SlateMetadata, SlatePage } from '~/types/slate.types'
-import { undefined } from 'zod'
 import type { SlateSheet } from '~/types/slate_sheet.types'
 
 export const defaultSlateMetadata = (): SlateMetadata => {

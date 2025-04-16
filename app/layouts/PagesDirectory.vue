@@ -48,13 +48,19 @@ const $pageId = computed(() => $route.params.pageId as string || '')
 
 <template>
     <div>
-        <div class="w-full fixed top-0 left-0 right-0 h-fit z-10">
-            <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default" data-tauri-drag-region>
-                <div class="flex items-center justify-center p-1 px-2 gap-2 rounded-lg backdrop-blur-md z-20 w-fit" data-tauri-drag-region>
+        <div class="w-fit left-1/2 transform -translate-x-1/2 fixed top-0 h-fit z-20 print:hidden">
+            <div class="flex items-center justify-center p-2 gap-2 select-none cursor-default" data-tauri-drag-region id="remove-during-print">
+                <div class="flex items-center justify-center p-1 px-2 gap-1 rounded-lg backdrop-blur-sm z-20 w-fit border border-(--ui-bg-muted) bg-(--ui-bg)/75 hover:bg-(--ui-bg) dark:shadow-flexoki-base-900 hover:shadow-lg hover:translate-y-[1px] duration-200 transition-all" data-tauri-drag-region>
+                    <Icon data-tauri-drag-region name="lucide:file-warning" class="size-4 bg-(--ui-text-toned)" v-if="$slate.getFilePath().value == null || ''"/>
+                    <template v-else>
+                        <Icon data-tauri-drag-region name="lucide:file-clock" class="size-4 bg-(--ui-text-toned) animate-pulse animate" v-if="$slate.isSavingFile().value"/>
+                        <Icon data-tauri-drag-region name="lucide:file-check" class="size-4 bg-(--ui-text-toned)" v-else-if="$slate.isFileSaved().value"/>
+                        <Icon data-tauri-drag-region name="lucide:file-x" class="size-4 bg-(--ui-error))" v-else/>
+                    </template>
                     <!--Ignore The Error Here... fucking typescript-->
                     <UBreadcrumb :items="breadcrumbs" class="text-sm select-none gap-1" data-tauri-drag-region>
                         <template #document="{item}" data-tauri-drag-region>
-                            <div data-tauri-drag-region class="px-1">{{item.label}}</div>
+                            <div data-tauri-drag-region class="px-1 text-(--ui-text-toned) text-sm">{{item.label}}</div>
                         </template>
                         <template #page="{item}" data-tauri-drag-region>
                             <UDropdownMenu :items="[
@@ -83,12 +89,6 @@ const $pageId = computed(() => $route.params.pageId as string || '')
                             <div class="text-(--ui-text-muted)" data-tauri-drag-region>/</div>
                         </template>
                     </UBreadcrumb>
-                    <Icon data-tauri-drag-region name="lucide:file-warning" class="size-3" v-if="$slate.getFilePath().value == null || ''"/>
-                    <template v-else>
-                        <Icon data-tauri-drag-region name="lucide:file-clock" class="size-3 animate-pulse animate" v-if="$slate.isSavingFile().value"/>
-                        <Icon data-tauri-drag-region name="lucide:file-check" class="size-3" v-else-if="$slate.isFileSaved().value"/>
-                        <Icon data-tauri-drag-region name="lucide:file-x" class="size-3 bg-error-500" v-else/>
-                    </template>
                 </div>
             </div>
         </div>

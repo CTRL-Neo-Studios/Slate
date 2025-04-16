@@ -1,4 +1,3 @@
-import { Highlight } from '@tiptap/extension-highlight'
 import { Underline } from '@tiptap/extension-underline'
 import { CharacterCount } from '@tiptap/extension-character-count'
 import { Table } from '@tiptap/extension-table'
@@ -9,10 +8,7 @@ import { SearchAndReplace } from '@sereneinserenade/tiptap-search-and-replace'
 import { Mathematics } from '@tiptap-pro/extension-mathematics'
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
 import AutoJoiner from 'tiptap-extension-auto-joiner'
-import { TaskList } from '@tiptap/extension-task-list'
-import { TaskItem } from '@tiptap/extension-task-item'
-import type { Editor } from '@tiptap/vue-3'
-import type { ShallowRef } from '@vue/reactivity'
+import { Document } from '@tiptap/extension-document'
 import { Typography } from '@tiptap/extension-typography'
 import { StarterKit } from '@tiptap/starter-kit'
 import CalloutNode from '~/components/Slate/Editor/Prose/CalloutNode'
@@ -20,19 +16,34 @@ import WikiLinkNode from '~/components/Slate/Editor/Prose/WikiLinkNode'
 import WikiLinkSuggestion from '~/components/Slate/Editor/Prose/WikiLinkSuggestion'
 import CardNode from '~/components/Slate/Editor/Prose/CardNode'
 import AccordionNode from '~/components/Slate/Editor/Prose/AccordionNode'
+import { UniqueID } from '@tiptap-pro/extension-unique-id'
+import { Markdown } from 'tiptap-markdown'
+import { Placeholder } from '@tiptap/extension-placeholder'
+import { DragHandle } from '@tiptap-pro/extension-drag-handle-vue-3'
+import { NodeRange } from '@tiptap-pro/extension-node-range'
+import Highlight from '~/components/Slate/Editor/Prose/Highlight'
+import CodeBlockShiki from 'tiptap-extension-code-block-shiki'
 
 export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any = null, ...extensions: any[]) => {
 
     const suggestionElement = ref<HTMLElement | null>(null)
+    const CustomDocument = Document.extend({
+        content: 'heading block*',
+    })
+
     let suggestionApp: any = null
 
     return useEditor({
         content: initialContent,
         editable,
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                document: false,
+                codeBlock: false,
+            }),
             TiptapLink,
             Highlight,
+
             Underline,
             CharacterCount,
             Table,
@@ -40,15 +51,54 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             TableHeader,
             TableCell,
             Typography,
-            SearchAndReplace,
-            GlobalDragHandle,
+            SearchAndReplace.configure({
+                searchResultClass: "search-result",
+                disableRegex: false,
+            }),
+            // GlobalDragHandle,
+            // DragHandle.configure({
+            //     render: () => {
+            //         const element = document.createElement('div')
+            //
+            //         // Use as a hook for CSS to insert an icon
+            //         element.classList.add('custom-drag-handle')
+            //
+            //         return element
+            //     },
+            // }),
+            NodeRange.configure({
+                // allow to select only on depth 0
+                // depth: 0,
+                key: null,
+            }),
             AutoJoiner,
             Mathematics,
             CalloutNode,
-            CardNode,
+            // CardNode,
             AccordionNode,
             WikiLinkNode,
             WikiLinkSuggestion,
+            CustomDocument,
+            UniqueID,
+            // Container,
+            Markdown.configure({
+                transformPastedText: true,
+                transformCopiedText: true,
+            }),
+            Placeholder.configure({
+                placeholder: ({ node }) => {
+                    if (node.type.name === 'heading') {
+                        return ''
+                    } else if (node.type.name === 'paragraph') {
+                        return 'Start typing or type \"/\" for more commands.'
+                    }
+
+                    return ''
+                },
+            }),
+            CodeBlockShiki.configure({
+                defaultTheme: 'tokyo-night'
+            }),
             // TaskList,
             // TaskItem.configure({
             //     HTMLAttributes: {

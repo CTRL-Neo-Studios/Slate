@@ -26,8 +26,8 @@ export type SlateMetadata = {
 }
 
 export type SlateConfig = {
-    colorTheme: 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose' | 'zinc',
-    backgroundTheme: 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone',
+    themePreset: string;
+    themes: SlateThemePreset[]
     embeddingModels: ModelProvider[],
     chatModels: ModelProvider[],
     selectedEmbeddingModel: string | null,
@@ -57,4 +57,61 @@ export type ModelProvider = {
     modelProvider: 'none' | 'openai' | 'ollama' | 'openrouter' | 'custom',
     apiKey: string,
     name: string,
+}
+
+export type SlateThemePreset = {
+    id: string;
+
+    // Slate UI
+    roundedCornerRadius: number, // in rem, default 0.25rem
+    interfaceFont: string, // default Inter
+    lightThemeColors: SlateThemeColors,
+    darkThemeColors: SlateThemeColors,
+    customCss: string, // default is blank
+
+    // Document UI
+    lightProseColors: SlateProseColors,
+    darkProseColors: SlateProseColors,
+    documentFont: string, // default Inter
+    documentCss: string, // default is blank
+}
+
+export type SlateThemeColors = {
+    // All strings are Hex Values. When being applied to CSS, these Hex values should be converted into oklab color formats.
+    uiTextDimmed: string,
+    uiTextMuted: string,
+    uiTextToned: string,
+    uiText: string,
+    uiTextHighlighted: string,
+
+    uiBg: string,
+    uiBgMuted: string,
+    uiBgElevated: string,
+    uiBgAccented: string,
+    uiBgInverted: string,
+
+    uiBorder: string,
+    uiBorderMuted: string,
+    uiBorderAccented: string,
+    uiBorderInverted: string,
+
+    uiPrimary: string,
+    uiSecondary: string,
+    uiSuccess: string,
+    uiInfo: string,
+    uiWarning: string,
+    uiError: string,
+}
+
+export type SlateProseColors = {
+    // All strings are Hex Values. When being applied to CSS, these Hex values should be converted into oklab color formats.
+    body: string,
+    headings: string,
+    links: string,
+    bold: string,
+    bullets: string,
+    quotes: string,
+    quoteBorders: string,
+    captions: string,
+    code: string,
 }

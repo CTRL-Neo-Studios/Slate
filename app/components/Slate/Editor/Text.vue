@@ -1,39 +1,31 @@
 <script setup lang="ts">
-import { SlateModalDocumentInformation, SlateModalNodesView, SlateSlideoverPagesTree } from '#components'
+// import { useVueToPrint } from 'vue-to-print'
 
+const editableElement = ref()
+// const { handlePrint } = useVueToPrint({
+//     content: editableElement
+// });
 defineShortcuts({
-    meta_g: {
-        usingInput: true,
-        handler: () => {
-            isOpenedPageTreeSlideover.value = !isOpenedPageTreeSlideover.value
-            if(isOpenedPageTreeSlideover.value) {
-                pagesTree()
-            }else {
-                slatePageTreeSliderover.close()
-            }
-        },
-    },
-    meta_shift_g: {
-        usingInput: true,
-        handler: () => {
-            isOpenedNodesView.value = !isOpenedNodesView.value
-            if(isOpenedNodesView.value) {
-                nodesView()
-            }else {
-                slateNodesViewModal.close()
-            }
-        }
-    },
     meta_p: {
         usingInput: true,
+        handler: async () => {
+            // await useNoteExporter().printPDF($editor, $slate.getCurrentSlatePage($pageId)?.name)
+            // window.print()
+            // console.log('pdf')
+            // await useNoteExporter().exportToPDF(editableElement, $slate.getCurrentSlatePage($pageId)?.name)
+            await useNoteExporter().printPDF(editableElement)
+            // try {
+            //     await exportToPDF('slate.pdf', editableElement.value)
+            // } catch (e) {
+            //     console.log(e)
+            // }
+        }
+    },
+    backspace: {
         handler: () => {
-            useNoteExporter().exportToPDF($editor)
+
         }
     }
-})
-
-onMounted(() => {
-    $appMenu.init()
 })
 
 onBeforeUnmount(() => {
@@ -48,51 +40,6 @@ const $appMenu = useAppMenu()
 const $save = useNoteSaver()
 const $slate = useSlateFile()
 const $slateCommon = useSlateCommon()
-const $m = useOverlay(), $t = useToast()
-
-const slateDocInfoModal = $m.create(SlateModalDocumentInformation)
-const slatePageTreeSliderover = $m.create(SlateSlideoverPagesTree)
-const slateNodesViewModal = $m.create(SlateModalNodesView)
-const isOpenedPageTreeSlideover = ref(false), isOpenedNodesView = ref(false)
-
-const breadcrumbs = computed(() => {
-    let arr = $slate.getCurrentNestedPageDirsPerformant($pageId).map((i: any) => {
-        return {
-            slot: 'page',
-            label: i.name,
-            icon: i.icon,
-            to: `/document/${i.uuid}`,
-        }
-    })
-    if (arr.length > 1){
-        let concat = {
-            slot: 'dropdown',
-            icon: 'lucide:ellipsis',
-            label: '',
-            children: [
-                ...arr.slice(0, arr.length-1)
-            ]
-        }
-        return [
-            {
-                icon: '',
-                slot: 'document',
-                label: $slate.getFileName(),
-            },
-            concat,
-            arr[arr.length-1],
-        ]
-    }
-
-    return [
-        {
-            icon: '',
-            slot: 'document',
-            label: $slate.getFileName(),
-        },
-        ...arr,
-    ]
-})
 
 const $pageId = computed(() => $route.params.pageId as string || '')
 
@@ -112,281 +59,18 @@ const $editor = useSlateEditor($slate.getCurrentSlatePage($pageId)?.content || '
     }
 })
 
-const buttonVariant = (toggled: boolean | undefined) => {
-    // console.log(toggled)
-    return (toggled || false) ? 'subtle' : 'ghost'
-};
-
-const moreTools = ref(false)
-const expandFormatting = ref(false)
-
-const boldToggled = computed(() => buttonVariant($editor.value?.isActive('bold')))
-const italicToggled = computed(() => buttonVariant($editor.value?.isActive('italic')))
-const strikeToggled = computed(() => buttonVariant($editor.value?.isActive('strike')))
-const underlinedToggled = computed(() => buttonVariant($editor.value?.isActive('underlined')))
-const codeToggled = computed(() => buttonVariant($editor.value?.isActive('code')))
-
-const insertTableRows = ref(2), insertTableCols = ref(2), insertTableHeaderRow = ref(true)
-const insertCalloutColor = ref('primary'), insertCalloutTitle = ref('Untitled'), insertCalloutIcon = ref('lucide:info'), insertCalloutVariant = ref('solid')
-const selectIconModalForCallout = $slateCommon.instantiateSelectIconModal((newIcon: string) => {
-    insertCalloutIcon.value = newIcon
-    insertAccordionIcon.value = newIcon
-})
-const insertCardVariant = ref('outline')
-const insertAccordionIcon = ref('lucide:info'), insertAccordionTitle = ref('Untitled')
-
-const colorsSelectOptions = themeVariableColors()
-const variantsSelectOptions = themeVariableVariants()
-
-const textStylesSelect = [
-    {
-        label: 'Paragraph',
-        value: 'paragraph',
-        icon: 'lucide:pilcrow'
-    },
-    {
-        label: 'Heading-1',
-        value: 'heading-1',
-        icon: 'lucide:heading-1'
-    },
-    {
-        label: 'Heading-2',
-        value: 'heading-2',
-        icon: 'lucide:heading-2'
-    },
-    {
-        label: 'Heading-3',
-        value: 'heading-3',
-        icon: 'lucide:heading-3'
-    },
-    {
-        label: 'Heading-4',
-        value: 'heading-4',
-        icon: 'lucide:heading-4'
-    },
-    {
-        label: 'Code',
-        value: 'code',
-        icon: 'lucide:code',
-    }
-]
-
-const currentTextStyle = computed(() => {
-    return $editor.value?.isActive('heading', { level: 1 }) ? 'heading-1' :
-        $editor.value?.isActive('heading', { level: 2 }) ? 'heading-2' :
-            $editor.value?.isActive('heading', { level: 3 }) ? 'heading-3' :
-                $editor.value?.isActive('heading', { level: 4 }) ? 'heading-4' :
-                    $editor.value?.isActive('heading', { level: 5 }) ? 'heading-5' :
-                        $editor.value?.isActive('heading', { level: 6 }) ? 'heading-6' :
-                            $editor.value?.isActive('codeBlock') ? 'code' : 'paragraph'
-})
-
-function setStyle(value: string) {
-    switch (value) {
-        case "paragraph":
-            $editor.value?.chain().focus().setParagraph().run();
-            break;
-        case "heading-1":
-            $editor.value?.chain().focus().toggleHeading({ level: 1 }).run();
-            break;
-        case "heading-2":
-            $editor.value?.chain().focus().toggleHeading({ level: 2 }).run();
-            break;
-        case "heading-3":
-            $editor.value?.chain().focus().toggleHeading({ level: 3 }).run();
-            break;
-        case "heading-4":
-            $editor.value?.chain().focus().toggleHeading({ level: 4 }).run();
-            break;
-        case "heading-5":
-            $editor.value?.chain().focus().toggleHeading({ level: 5}).run();
-            break;
-        case "heading-6":
-            $editor.value?.chain().focus().toggleHeading({ level: 6 }).run();
-            break;
-        case "code":
-            $editor.value?.chain().focus().toggleCodeBlock().run();
-            break;
-    }
-}
-
-function documentInformation() {
-    return `${$editor.value?.storage.characterCount.words()} Words, ${$editor.value?.storage.characterCount.characters()} Characters`
-}
-
-function pagesTree() {
-    slatePageTreeSliderover.open({
-        pages: $slate.getCurrentSlateDoc().value?.pages,
-        currentPage: $pageId,
-    })
-}
-
-function nodesView() {
-    slateNodesViewModal.open({
-        currentPage: $pageId,
-    })
-}
-
 </script>
 
 <template>
     <div class="w-full flex justify-center items-start min-h-screen">
-        <div class="h-full sm:w-xl md:w-2xl w-3xl lg:w-4xl xl:w-5xl">
-            <TiptapEditorContent :editor="$editor" class="max-w-none w-full h-full" />
+        <div class="h-full sm:w-xl md:w-2xl w-3xl lg:w-4xl xl:w-5xl" ref="editableElement">
+            <SlateEditorDragHandle :editor="$editor" v-if="$editor"/>
+            <TiptapEditorContent :editor="$editor" v-if="$editor" class="max-w-none w-full h-full"/>
             <template v-if="showBottomBar">
-                <div class="w-full fixed bottom-0 left-0 right-0 h-fit z-10" id="remove-during-print">
-                    <div class="w-full flex items-center justify-start p-1 gap-1 select-none">
-                        <Transition class="transition-all duration-200 h-fit w-fit" enter-active-class="blur-sm opacity-0" leave-active-class="blur-sm opacity-0">
-                            <div class="w-fit flex items-center gap-1 h-fit pl-1" v-if="!expandFormatting">
-                                <UButton icon="lucide:type" size="xs" :variant="'ghost'"
-                                         :disabled="!$editor"
-                                         @click="expandFormatting = true"/>
-                            </div>
-                            <div class="w-fit flex items-center gap-1 h-fit pl-1" v-else>
-                                <UButton icon="lucide:circle-x" size="xs" :variant="'ghost'"
-                                         :disabled="!$editor"
-                                         @click="expandFormatting = false"/>
-                                <USeparator class="h-3" orientation="vertical"/>
-                                <Transition class="transition-all duration-200 h-fit w-fit" enter-active-class="blur-sm opacity-0" leave-active-class="blur-sm opacity-0">
-                                    <div class="w-fit flex items-center justify-start rounded-lg backdrop-blur-md p-1 gap-1 select-none" v-if="!moreTools">
-                                        <USelect v-model="currentTextStyle" size="xs" :items="textStylesSelect"
-                                                 :disabled="!$editor?.can().chain().focus().toggleHeading({level: 1}).run()"
-                                                 @update:model-value="setStyle" />
-                                        <UTooltip text="Bold" :kbds="['meta', 'B']">
-                                            <UButton icon="lucide:bold" size="xs" :variant="boldToggled"
-                                                     :disabled="!$editor?.can().chain().focus().toggleBold().run()"
-                                                     @click="$editor?.chain().focus().toggleBold().run()"/>
-                                        </UTooltip>
-                                        <UButton icon="lucide:italic" size="xs" :variant="italicToggled"
-                                                 :disabled="!$editor?.can().chain().focus().toggleItalic().run()"
-                                                 @click="$editor?.chain().focus().toggleItalic().run()"/>
-                                        <UButton icon="lucide:strikethrough" size="xs" :variant="strikeToggled"
-                                                 :disabled="!$editor?.can().chain().focus().toggleStrike().run()"
-                                                 @click="$editor?.chain().focus().toggleStrike().run()"/>
-                                        <UButton icon="lucide:underline" size="xs" :variant="underlinedToggled"
-                                                 :disabled="!$editor?.can().chain().focus().toggleUnderline().run()"
-                                                 @click="$editor?.chain().focus().toggleUnderline().run()"/>
-                                        <UButton icon="lucide:code" size="xs" :variant="codeToggled"
-                                                 :disabled="!$editor?.can().chain().focus().toggleCode().run()"
-                                                 @click="$editor?.chain().focus().toggleCode().run()"/>
-                                        <UPopover>
-                                            <UButton icon="lucide:table" size="xs" variant="ghost"
-                                                     :disabled="!$editor?.can().chain().focus().insertTable()"/>
-                                            <template #content>
-                                                <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
-                                                    <div class="grid grid-cols-2 w-40 gap-2">
-                                                        <div class="text-xs flex items-center">Rows</div>
-                                                        <UInputNumber size="xs" v-model="insertTableRows" :min="1"/>
-                                                        <div class="text-xs flex items-center">Columns</div>
-                                                        <UInputNumber size="xs" v-model="insertTableCols" :min="1"/>
-                                                        <div class="text-xs flex items-center">Header Row</div>
-                                                        <USwitch size="xs" v-model="insertTableHeaderRow"/>
-                                                    </div>
-                                                    <UButton @click="$editor?.chain().focus().insertTable({ rows: insertTableRows, cols: insertTableCols, withHeaderRow: insertTableHeaderRow }).run()"
-                                                             size="xs" class="w-full justify-center items-center" label="Insert"/>
-                                                </div>
-                                            </template>
-                                        </UPopover>
-                                        <UTooltip text="More Actions..." :delay-duration="300">
-                                            <UButton icon="lucide:ellipsis" size="xs" variant="ghost"
-                                                     :disabled="!$editor"
-                                                     @click="moreTools = true"/>
-                                        </UTooltip>
-                                    </div>
-                                    <div class="w-fit flex items-center justify-start rounded-lg backdrop-blur-md p-1 gap-1 select-none" v-else>
-                                        <UTooltip text="Back" :delay-duration="300">
-                                            <UButton icon="lucide:chevron-left" size="xs"
-                                                     :disabled="!$editor"
-                                                     @click="moreTools = false"/>
-                                        </UTooltip>
-                                        <UPopover>
-                                            <UButton icon="lucide:rectangle-ellipsis" size="xs" variant="ghost"
-                                                     :disabled="!$editor"/>
-                                            <template #content>
-                                                <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
-                                                    <div class="grid grid-cols-2 w-40 gap-2">
-                                                        <div class="text-xs flex items-center">Title</div>
-                                                        <UInput size="xs" v-model="insertCalloutTitle"/>
-                                                        <div class="text-xs flex items-center">Icon</div>
-                                                        <UButton size="xs" class="w-fit justify-self-end" :icon="insertCalloutIcon" @click="selectIconModalForCallout.open()"/>
-                                                        <div class="text-xs flex items-center">Color</div>
-                                                        <USelect size="xs" v-model="insertCalloutColor" :items="colorsSelectOptions"/>
-                                                        <div class="text-xs flex items-center">Variant</div>
-                                                        <USelect size="xs" v-model="insertCalloutVariant" :items="variantsSelectOptions"/>
-                                                    </div>
-                                                    <UButton @click="() => {
-                                                    //@ts-ignore
-                                                    $editor?.chain().focus().setCallout({ icon: insertCalloutIcon, color: insertCalloutColor, title: insertCalloutTitle, variant: insertCalloutVariant }).run()
-                                                }"
-                                                             size="xs" class="w-full justify-center items-center" label="Insert"/>
-                                                </div>
-                                            </template>
-                                        </UPopover>
-                                        <UPopover>
-                                            <UButton icon="lucide:square-asterisk" size="xs" variant="ghost"
-                                                     :disabled="!$editor"/>
-                                            <template #content>
-                                                <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
-                                                    <div class="grid grid-cols-2 w-40 gap-2">
-                                                        <div class="text-xs flex items-center">Variant</div>
-                                                        <USelect size="xs" v-model="insertCardVariant" :items="variantsSelectOptions"/>
-                                                    </div>
-                                                    <UButton @click="() => {
-                                                    //@ts-ignore
-                                                    $editor?.chain().focus().setCard({ variant: insertCardVariant }).run()
-                                                }"
-                                                             size="xs" class="w-full justify-center items-center" label="Insert"/>
-                                                </div>
-                                            </template>
-                                        </UPopover>
-                                        <UPopover>
-                                            <UButton icon="lucide:list-collapse" size="xs" variant="ghost"
-                                                     :disabled="!$editor"/>
-                                            <template #content>
-                                                <div class="flex flex-col items-end justify-center p-2 w-fit h-fit gap-2">
-                                                    <div class="grid grid-cols-2 w-40 gap-2">
-                                                        <div class="text-xs flex items-center">Title</div>
-                                                        <UInput size="xs" v-model="insertAccordionTitle"/>
-                                                        <div class="text-xs flex items-center">Icon</div>
-                                                        <UButton size="xs" class="w-fit justify-self-end" :icon="insertAccordionIcon" @click="selectIconModalForCallout.open()"/>
-                                                    </div>
-                                                    <UButton @click="() => {
-                                                    //@ts-ignore
-                                                    $editor?.chain().focus().setAccordion({ title: insertAccordionTitle, icon: insertAccordionIcon }).run()
-                                                }"
-                                                             size="xs" class="w-full justify-center items-center" label="Insert"/>
-                                                </div>
-                                            </template>
-                                        </UPopover>
-                                    </div>
-                                </Transition>
-                            </div>
-                        </Transition>
-
-                        <div class="flex-grow -z-20"/>
-                        <div class="w-fit flex items-center justify-end rounded-lg backdrop-blur-md p-1 gap-1 select-none">
-                            <UTooltip :text="documentInformation()" :delay-duration="200">
-                                <UButton icon="lucide:info" size="xs" variant="ghost" @click="() => {
-                                        slateDocInfoModal.open({
-                                            wordCount: $editor?.storage.characterCount.words(),
-                                            charCount: $editor?.storage.characterCount.characters()
-                                        })
-                                    }"/>
-                            </UTooltip>
-                            <UTooltip :kbds="['meta', 'G']" text="Page Trees">
-                                <UButton icon="lucide:list-tree" size="xs" variant="ghost" @click="() => {
-                                        pagesTree()
-                                    }"/>
-                            </UTooltip>
-                            <UTooltip :kbds="['meta', 'shift', 'G']" text="Nodes View">
-                                <UButton icon="lucide:network" size="xs" variant="ghost" @click="() => {
-                                        nodesView()
-                                    }"/>
-                            </UTooltip>
-                        </div>
-                    </div>
-                </div>
+                <SlateEditorTextStylingToolbar :editor="$editor" v-if="$editor"/>
+                <SlateEditorViewsToolbar :editor="$editor" :pageId="$pageId" v-if="$editor"/>
             </template>
+            <SlateEditorSearchReplaceTool :editor="$editor"/>
         </div>
     </div>
 </template>
@@ -395,7 +79,7 @@ function nodesView() {
 @reference "~/assets/css/main.css";
 
 .tiptap {
-    @apply h-full min-h-max w-full max-w-none px-10 pt-16 pb-40 prose-sm prose prose-zinc dark:prose-invert;
+    @apply h-full min-h-max w-full max-w-none px-10 pt-16 pb-40 custom-prose;
 
     a {
         @apply cursor-pointer underline;
@@ -406,10 +90,6 @@ div[contenteditable='true']:focus {
     @apply outline-none border-none h-full shadow-none;
 }
 
-.search-result {
-    @apply bg-red-500 p-1 rounded-lg text-white;
-}
-
 .mention {
     @apply cursor-pointer p-1 rounded-md;
 }
@@ -417,81 +97,74 @@ div[contenteditable='true']:focus {
 .tiptap p.is-editor-empty:first-child::before {
     @apply animate-pulse float-left h-0 pointer-events-none;
     content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
 }
 
 .tiptap {
-    td {
-        @apply active:first:border-r active:last:border-l border-x-neutral-700
+
+    strong {
+        @apply font-bold
     }
-    th {
-        @apply active:first:border-r active:last:border-l border-x-neutral-700
+
+    mark {
+        @apply bg-(--ui-bg-inverted) text-(--ui-bg) rounded-xs px-0.5
+    }
+
+}
+
+.ProseMirror .column-block {
+    width: 100%;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 24px;
+    padding: 8px 0;
+}
+
+.ProseMirror .column {
+    overflow: hidden;
+    padding: 8px;
+    margin: -8px;
+}
+
+.ProseMirror-focused .column {
+    border: 1px gray dashed;
+    border-radius: 8px;
+}
+
+::selection {
+    background-color: #70CFF850;
+}
+
+.ProseMirror-noderangeselection {
+    *::selection {
+        background: transparent;
+    }
+
+    * {
+        caret-color: transparent;
     }
 }
 
-.drag-handle {
-    position: fixed;
-    opacity: 1;
-    transition: opacity ease-in 0.2s;
-    border-radius: 0.25rem;
+.ProseMirror-selectednode,
+.ProseMirror-selectednoderange {
+    position: relative;
 
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(0, 0, 0, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
-    background-size: calc(0.5em + 0.375rem) calc(0.5em + 0.375rem);
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 1.2rem;
-    height: 1.5rem;
-    z-index: 50;
-    cursor: grab;
-
-    &:hover {
-        transition: background-color 0.2s;
-    }
-
-    &:active {
-        transition: background-color 0.2s;
-        cursor: grabbing;
-    }
-
-    &.hide {
-        opacity: 0;
+    &::before {
+        position: absolute;
         pointer-events: none;
+        z-index: -1;
+        content: '';
+        top: -0.25rem;
+        left: -0.25rem;
+        right: -0.25rem;
+        bottom: -0.25rem;
+        background-color: #70CFF850;
+        border-radius: 0.2rem;
     }
-
-    @media screen and (max-width: 600px) {
-        display: none;
-        pointer-events: none;
-    }
 }
-
-.dark .drag-handle {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(255, 255, 255, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
-}
-
-/*
-.task-item-prose {
-    @apply prose;
-}
-
-li[data-type="taskList"] {
-    @apply flex gap-2 items-start list-none pl-0;
-}
-
-li[data-type="taskList"] label {
-    @apply flex items-center gap-2 cursor-pointer;
-}
-
-li[data-type="taskList"] input[type="checkbox"] {
-    @apply mt-1 h-4 w-4 cursor-pointer rounded border-gray-300;
-}
-
-ul[data-type="taskList"] {
-    @apply list-none pl-0;
-}
-
-li[data-type="taskList"] div {
-    @apply flex-1;
-}
-*/
 
 .table-of-contents {
     @apply flex flex-col text-sm gap-1 overflow-auto no-underline;

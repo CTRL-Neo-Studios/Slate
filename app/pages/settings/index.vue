@@ -28,12 +28,12 @@ onMounted(() => {
 })
 
 watch(docConf, async (newConf) => {
-    console.log(newConf)
+    // console.log(newConf)
     await $config.updateDocumentConfig(newConf)
 }, { deep: true })
 
 watch(slateConf, async (newConf) => {
-    console.log(newConf)
+    // console.log(newConf)
     await $config.updateGlobalConfig(newConf)
 }, { deep: true })
 </script>

@@ -10,6 +10,11 @@ export const useSlateConfig = () => {
     const globalConfig = useState<SlateConfig>('globalSlateConfig', () => defaultSlateConfig());
     const globalConfigLoaded = useState<boolean>('globalConfigLoaded', () => false);
     const lastPage = useState<string>('lastRoutedPage', () => '')
+    const appPath = 'Slate'
+
+    function getBaseConfigPath() {
+        return `${appPath}/${configFilePath}`
+    }
 
     async function openConfig(from: PossiblyRef<string>) {
         lastPage.value = unref(from)
@@ -26,17 +31,17 @@ export const useSlateConfig = () => {
     async function initGlobalConfig(): Promise<void> {
         try {
             // Ensure config directory exists
-            const configDirExists = await exists('', { baseDir: BaseDirectory.AppConfig });
+            const configDirExists = await exists(appPath, { baseDir: BaseDirectory.AppConfig });
             if (!configDirExists) {
-                await mkdir('', { baseDir: BaseDirectory.AppConfig, recursive: true });
+                await mkdir(appPath, { baseDir: BaseDirectory.AppConfig, recursive: true });
             }
 
             // Check if config file exists
-            const configExists = await exists(configFilePath, { baseDir: BaseDirectory.AppConfig });
+            const configExists = await exists(getBaseConfigPath(), { baseDir: BaseDirectory.AppConfig });
 
             if (configExists) {
                 // Load existing config
-                const configData = await readTextFile(configFilePath, { baseDir: BaseDirectory.AppConfig });
+                const configData = await readTextFile(getBaseConfigPath(), { baseDir: BaseDirectory.AppConfig });
                 try {
                     const loadedConfig = JSON.parse(configData);
                     // Merge with defaults to ensure all properties exist
@@ -56,6 +61,8 @@ export const useSlateConfig = () => {
             console.error('Error initializing config:', error);
             globalConfig.value = defaultSlateConfig();
             globalConfigLoaded.value = true;
+        } finally {
+            applyConfigEffects()
         }
     }
 
@@ -68,7 +75,7 @@ export const useSlateConfig = () => {
             const encoder = new TextEncoder();
             const data = encoder.encode(configJson);
 
-            await writeFile(configFilePath, data, { baseDir: BaseDirectory.AppConfig });
+            await writeFile(getBaseConfigPath(), data, { baseDir: BaseDirectory.AppConfig });
             applyConfigEffects()
             return true;
         } catch (error) {

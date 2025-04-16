@@ -17,6 +17,7 @@
 // document
 //     .getElementById('titlebar-close')
 //     ?.addEventListener('click', () => appWindow.close());
+
 </script>
 
 <template>
@@ -27,7 +28,7 @@
 <!--            &lt;!&ndash;            <UButton size="sm" icon="lucide:x" @click="getCurrentWebviewWindow().close()"/>&ndash;&gt;-->
 <!--        </div>-->
 <!--    </Head>-->
-    <NuxtLoadingIndicator color="gray"/>
+    <NuxtLoadingIndicator/>
     <UApp>
         <NuxtLayout>
             <NuxtPage />
@@ -56,4 +57,17 @@
     filter: blur(1rem);
 }
 
+::-webkit-scrollbar {
+    display: none; /* or width: 0 */
+}
+
+/* For Firefox */
+html {
+    scrollbar-width: none;
+}
+
+/* For IE/Edge */
+body {
+    -ms-overflow-style: none;
+}
 </style>

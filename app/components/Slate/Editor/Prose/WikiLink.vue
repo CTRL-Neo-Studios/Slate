@@ -50,7 +50,7 @@ const linkText = computed(() => {
     }
 
     // If not valid, use pageId as text (which may be a title that doesn't match a page)
-    return 'Undefined Page'
+    return pageId.value
 })
 
 // Navigate to the linked page
@@ -64,7 +64,7 @@ function navigateToPage() {
 <template>
     <NodeViewWrapper
         as="a"
-        :class="['wiki-link inline-flex items-center rounded px-0.5 gap-0.5', isValid ? '' : 'text-error-400 not-prose']"
+        :class="['wiki-link inline-flex items-center rounded px-0.5 gap-0.5', isValid ? '' : 'text-(--prose-quotes)']"
         @click.prevent="navigateToPage"
         :data-tooltip="pagePath ? `Located in: ${pagePath}` : undefined"
     >
