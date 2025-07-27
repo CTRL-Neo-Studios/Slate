@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Editor } from '@tiptap/vue-3'
-import { DragHandle } from '@tiptap-pro/extension-drag-handle-vue-3'
+import { DragHandle } from '@tiptap/extension-drag-handle-vue-3'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { useTiptapNodeData } from '~/composables/useTiptapNodeData'
 import type { NodeSelection } from 'prosemirror-state'

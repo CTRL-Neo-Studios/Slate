@@ -1,4 +1,4 @@
-<script>
+<script setup lang="ts">
 // import { getCurrentWindow } from '@tauri-apps/api/window';
 // import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 
@@ -17,7 +17,12 @@
 // document
 //     .getElementById('titlebar-close')
 //     ?.addEventListener('click', () => appWindow.close());
-
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault(); // Prevent the default context menu
+    // Optionally, you can add your own logic here to handle the right-click event
+    // For example, you might want to show a custom menu
+    // or perform some other action.
+});
 </script>
 
 <template>

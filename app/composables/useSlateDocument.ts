@@ -28,6 +28,7 @@ export function useSlateDocument() {
     const _docConfig = useState<SdxFileConfig | null>('sd.documentConfig', () => null)
     const _docMetadata = useState<SdxFileMetadata | null>('sd.documentMetadata', () => null)
     const _docTreeMap = useState<SdxPageTreeElement[]>('sd.documentTreeMap', () => [])
+    const _docPages = useState<SdxPage[]>('sd.pages', () => [])
 
     /**
      * Gets the document stored in the buffer.

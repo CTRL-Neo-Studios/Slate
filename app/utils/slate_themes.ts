@@ -7,8 +7,8 @@ export function slateDefaultThemes() {
             id: '0',
             customCss: '',
             documentCss: '',
-            documentFont: 'Inter',
-            interfaceFont: 'Inter',
+            documentFont: 'Segoe UI Variable Static Display',
+            interfaceFont: 'Segoe UI Variable Static Display',
             roundedCornerRadius: 0.25, // 0.25rem
             lightThemeColors: {
                 uiTextDimmed: 'oklch(70.5% 0.015 286.067)', // zinc-400

@@ -5,8 +5,7 @@ import { TableRow } from '@tiptap/extension-table-row'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { SearchAndReplace } from '@sereneinserenade/tiptap-search-and-replace'
-import { Mathematics } from '@tiptap-pro/extension-mathematics'
-import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
+import { Mathematics } from '@tiptap/extension-mathematics'
 import AutoJoiner from 'tiptap-extension-auto-joiner'
 import { Document } from '@tiptap/extension-document'
 import { Typography } from '@tiptap/extension-typography'
@@ -16,11 +15,10 @@ import WikiLinkNode from '~/components/Slate/Editor/Prose/WikiLinkNode'
 import WikiLinkSuggestion from '~/components/Slate/Editor/Prose/WikiLinkSuggestion'
 import CardNode from '~/components/Slate/Editor/Prose/CardNode'
 import AccordionNode from '~/components/Slate/Editor/Prose/AccordionNode'
-import { UniqueID } from '@tiptap-pro/extension-unique-id'
-import { Markdown } from 'tiptap-markdown'
+import { UniqueID } from '@tiptap/extension-unique-id'
 import { Placeholder } from '@tiptap/extension-placeholder'
-import { DragHandle } from '@tiptap-pro/extension-drag-handle-vue-3'
-import { NodeRange } from '@tiptap-pro/extension-node-range'
+import { DragHandle } from '@tiptap/extension-drag-handle-vue-3'
+import { NodeRange } from '@tiptap/extension-node-range'
 import Highlight from '~/components/Slate/Editor/Prose/Highlight'
 import CodeBlockShiki from 'tiptap-extension-code-block-shiki'
 import { TaskList } from '@tiptap/extension-task-list'
@@ -75,10 +73,6 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             CustomDocument,
             UniqueID,
             // Container,
-            Markdown.configure({
-                transformPastedText: true,
-                transformCopiedText: true,
-            }),
             Placeholder.configure({
                 placeholder: ({ node }) => {
                     if (node.type.name === 'heading') {

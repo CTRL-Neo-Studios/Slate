@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { useSlateFile } from '~/composables/useSlateFile'
+import { useNoteImporter } from '~/composables/useNoteImporter'
+import { useSlateConfig } from '~/composables/useSlateConfig'
+import { useAppMenu } from '~/composables/useAppMenu'
+
 const $slate = useSlateFile()
 const $import = useNoteImporter()
 const $config = useSlateConfig()
@@ -13,6 +18,7 @@ onMounted(async () => {
 
 function createDoc() {
     $slate.createSlateDocument()
+    //
 }
 
 function openDoc() {
