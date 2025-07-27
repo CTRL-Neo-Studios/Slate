@@ -68,8 +68,8 @@ export function slateDefaultThemes() {
                 code: 'oklch(44.2% 0.017 285.786)', // zinc-600, inline code
                 links: 'oklch(37% 0.013 285.805)', // zinc-700, inline links and wikilinks
                 headings: 'oklch(14.1% 0.005 285.823)', // zinc-950, Headers
-                quotes: 'oklch(37% 0.013 285.805)', // zinc-700, the quote text in quoteblocks
-                quoteBorders: 'oklch(37% 0.013 285.805)', // zinc-700, the quote side stripe in quoteblocks
+                quotes: 'oklch(44.2% 0.017 285.786)', // zinc-600, the quote text in quoteblocks
+                quoteBorders: 'oklch(44.2% 0.017 285.786)', // zinc-600, the quote side stripe in quoteblocks
             },
             darkProseColors: {
                 body: 'oklch(92% 0.004 286.32)', // zinc-200, body text
@@ -79,8 +79,8 @@ export function slateDefaultThemes() {
                 code: 'oklch(70.5% 0.015 286.067)', // zinc-400, inline code
                 links: 'oklch(87.1% 0.006 286.286)', // zinc-300, inline links and wikilinks
                 headings: 'oklch(98.5% 0 0)', // zinc-50, Headers
-                quotes: 'oklch(87.1% 0.006 286.286)', // zinc-300, the quote text in quoteblocks
-                quoteBorders: 'oklch(87.1% 0.006 286.286)', // zinc-300, the quote side stripe in quoteblocks
+                quotes: 'oklch(70.5% 0.015 286.067)', // zinc-400, the quote text in quoteblocks
+                quoteBorders: 'oklch(70.5% 0.015 286.067)', // zinc-400, the quote side stripe in quoteblocks
             },
         } satisfies SlateThemePreset
     }

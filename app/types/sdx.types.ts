@@ -15,7 +15,7 @@ export type SdxFileConfig = { // .sdx/config.json
     homepage?: string,
 }
 
-export type SdxPage = { // .sdx/content.db (SQLite)
+export type SdxPage = { // .sdx/content.db (SQLite); this is in a schema table already but i'll leave this here for now; The type is deprecated
     uuid: string,
     content: string, // stored by default as Markdown
     persistentData: any,

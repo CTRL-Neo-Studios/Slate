@@ -12,6 +12,7 @@ export const useSlateFile = () => {
     const currentSlateDoc = useState<SlateDocument | null>('slateDocument', () => null)
     const pageMap = useState<Map<string, SlatePage>>('pageMap', () => new Map())
     const expandedTreeNodes = useState<string[]>("expandedTreeNodes", () => [])
+    const tabList = useState<string[]>("tabList", () => [])
 
     const pageReindexSubscribers = useState<(() => void)[]>(() => []);
     const subscribeOnPageReindex = (callback: () => void): () => void => {
@@ -152,7 +153,7 @@ export const useSlateFile = () => {
 
         pageMap.value.set(newPageUUID, newPage)
         useNoteSaver().autoSave()
-        await navigateTo(`/document/${newPageUUID}`)
+        await useSlateCommon().toPage(newPageUUID)
     }
 
     // New utility method for moving pages in the hierarchy
@@ -210,7 +211,7 @@ export const useSlateFile = () => {
                         clearFile()
                         currentSlateDoc.value = createDefaultSlateDocument(newPageUUID)
                         rebuildPageMap()
-                        await navigateTo(`/document/${newPageUUID}`)
+                        await useSlateCommon().toPage(newPageUUID)
                         modal.close()
                     },
                 },
@@ -220,7 +221,7 @@ export const useSlateFile = () => {
             clearFile()
             currentSlateDoc.value = createDefaultSlateDocument(newPageUUID)
             rebuildPageMap()
-            navigateTo(`/document/${newPageUUID}`)
+            useSlateCommon().toPage(newPageUUID)
         }
 
         return newPageUUID
@@ -232,8 +233,8 @@ export const useSlateFile = () => {
      * @param recursive - If true, deletes all child pages. If false, promotes child pages to the parent's level
      * @returns boolean - Whether the deletion was successful
      */
-    const deletePage = (pageUUID: string, recursive: boolean = false): boolean => {
-        if ((currentSlateDoc.value?.pages.length || 1) <= 1 && currentSlateDoc.value?.pages[0]?.uuid == pageUUID) {
+    const deletePage = (pageUUID: PossiblyRef<string>, recursive: boolean = false): boolean => {
+        if ((currentSlateDoc.value?.pages.length || 1) <= 1 && currentSlateDoc.value?.pages[0]?.uuid == unref(pageUUID)) {
             $t.add({
                 title: 'You cannot delete the only page in your document.',
                 color: 'error',
@@ -246,7 +247,7 @@ export const useSlateFile = () => {
             rebuildPageMap()
         }
 
-        const pageToDelete = pageMap.value?.get(pageUUID)
+        const pageToDelete = pageMap.value?.get(unref(pageUUID))
         if (!pageToDelete) return false
 
         // Helper function to find parent page and index
@@ -273,6 +274,7 @@ export const useSlateFile = () => {
 
         // Helper function to recursively delete pages from the map
         const deletePageAndChildren = (page: SlatePage) => {
+            removeTab(page.uuid)
             pageMap.value.delete(page.uuid)
             if (page.children?.length) {
                 page.children.forEach(child => deletePageAndChildren(child))
@@ -281,7 +283,7 @@ export const useSlateFile = () => {
 
         if (!currentSlateDoc.value) return false
 
-        const parentInfo = findParentInfo(currentSlateDoc.value.pages, pageUUID)
+        const parentInfo = findParentInfo(currentSlateDoc.value.pages, unref(pageUUID))
         if (!parentInfo) return false
 
         const { parent, index } = parentInfo
@@ -293,13 +295,14 @@ export const useSlateFile = () => {
             pages.splice(index, 1)
         } else {
             // Delete only the page and promote its children
-            pageMap.value?.delete(pageUUID)
+            pageMap.value?.delete(unref(pageUUID))
+            removeTab(pageUUID)
             const childrenToPromote = pageToDelete.children || []
             pages.splice(index, 1, ...childrenToPromote)
         }
 
         if (getCurrentSlatePage(useRoute().params.pageId as any as string || '') == null)
-            navigateTo(`/document/${currentSlateDoc.value.pages[0]?.uuid || ''}`)
+            useSlateCommon().toPage(currentSlateDoc.value.pages[0]?.uuid || '')
 
         return true
     }
@@ -526,25 +529,25 @@ export const useSlateFile = () => {
     }
 
     // Clear expansion state when loading new document
-    const setSlateDocument = (doc: SlateDocument) => {
+    function setSlateDocument(doc: SlateDocument) {
         currentSlateDoc.value = doc
         // expandedNodes.value.clear() // Clear expansion state
         rebuildPageMap()
     }
 
-    const cacheExpandedNode = (nodeId: string) => {
+    function cacheExpandedNode(nodeId: string) {
         expandedTreeNodes.value.push(nodeId)
     }
 
-    const uncacheExpandedNode = (nodeId: string) => {
+    function uncacheExpandedNode(nodeId: string) {
         expandedTreeNodes.value = expandedTreeNodes.value.filter(i => i !== nodeId)
     }
 
-    const clearExpandedNodeCache = () => {
+    function clearExpandedNodeCache () {
         expandedTreeNodes.value = []
     }
 
-    const getExpandedNodeCache = () => {
+    function getExpandedNodeCache() {
         return expandedTreeNodes
     }
 
@@ -553,7 +556,7 @@ export const useSlateFile = () => {
      * @param pageUUID UUID of the page to find parent for
      * @returns Parent SlatePage or undefined if no parent (root level) or page not found
      */
-    const getPageParent = (pageUUID: string): SlatePage | undefined => {
+    function getPageParent(pageUUID: string): SlatePage | undefined {
         // Check if page exists
         if (!pageMap.value.has(pageUUID)) return undefined
 
@@ -573,7 +576,7 @@ export const useSlateFile = () => {
      * @param currentUuid
      * @returns Object containing nodes and edges for graph visualization
      */
-    const getPagesAsNodesAndEdges = (rootNodeName: string = 'Document Root', currentUuid: PossiblyRef<string>) => {
+    function getPagesAsNodesAndEdges (rootNodeName: string = 'Document Root', currentUuid: PossiblyRef<string>) {
         if (!currentSlateDoc.value) {
             return { nodes: {}, edges: {} };
         }
@@ -626,11 +629,11 @@ export const useSlateFile = () => {
         return { nodes, edges };
     };
 
-    const isPageSheet = (pageUuid: PossiblyRef<string>) => {
+    function isPageSheet(pageUuid: PossiblyRef<string>) {
         return getCurrentSlatePage(pageUuid)?.sheet != null;
     }
 
-    const setPageSheet = (pageUuid: PossiblyRef<string>, data: Partial<SlateSheet>) => {
+    function setPageSheet (pageUuid: PossiblyRef<string>, data: Partial<SlateSheet>) {
         setSlatePageData(pageUuid, {
             sheet: {
                 ...defaultSlateSheet(),
@@ -639,8 +642,24 @@ export const useSlateFile = () => {
         })
     }
 
-    const getPageSheet = (pageUuid: PossiblyRef<string>) => {
+    function getPageSheet(pageUuid: PossiblyRef<string>) {
         return getCurrentSlatePage(pageUuid)?.sheet;
+    }
+
+    function addTab(pageUuid: PossiblyRef<string>) {
+        tabList.value.push(unref(pageUuid))
+    }
+
+    function getTabs() {
+        return tabList
+    }
+
+    function removeTab(pageUuid: PossiblyRef<string>) {
+        tabList.value = tabList.value.filter((i: string) => i != unref(pageUuid))
+    }
+
+    function clearTabs(preserveUuid: PossiblyRef<string> = '') {
+        tabList.value = tabList.value.filter((i: string) => i == unref(preserveUuid))
     }
 
 
@@ -684,6 +703,10 @@ export const useSlateFile = () => {
         getCachedFlattenedPages,
         isPageSheet,
         setPageSheet,
-        getPageSheet
+        getPageSheet,
+        addTab,
+        removeTab,
+        clearTabs,
+        getTabs
     }
 }

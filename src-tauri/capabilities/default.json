@@ -26,7 +26,11 @@
     "fs:create-app-specific-dirs",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$APPDATA/*" }]
+      "allow": [
+        {
+          "path": "$APPDATA/*"
+        }
+      ]
     },
     "fs:allow-app-read-recursive",
     "fs:allow-appconfig-read-recursive",
@@ -45,6 +49,7 @@
     "fs:allow-desktop-meta-recursive",
     "fs:allow-resource-read-recursive",
     "fs:allow-resource-meta-recursive",
-    "core:webview:allow-print"
+    "core:webview:allow-print",
+    "sql:default"
   ]
 }

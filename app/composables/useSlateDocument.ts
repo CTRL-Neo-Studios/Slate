@@ -5,6 +5,9 @@ import { useQuickToasts } from '~/composables/useQuickToasts'
 import type { PossiblyRef } from '~/types/utility.types'
 import type { Editor } from '@tiptap/vue-3'
 import { sdxDefaults } from '~/utils/sdx_utils'
+import { useSlateContentDb } from '~/composables/useSlateContentDb'
+import { pages } from '~~/server/database/schema'
+import { eq } from 'drizzle-orm'
 
 /**
  * The layer that manages the .sdx document as a whole. Including the Pages, metadata, and config.
@@ -17,13 +20,13 @@ import { sdxDefaults } from '~/utils/sdx_utils'
 export function useSlateDocument() {
     const $t = useToast()
     const $qt = useQuickToasts()
+    const $con = useSlateContentDb()
 
     const $sio = useSlateFileIO()
 
     // Document Data Buffer
     const _docConfig = useState<SdxFileConfig | null>('sd.documentConfig', () => null)
     const _docMetadata = useState<SdxFileMetadata | null>('sd.documentMetadata', () => null)
-    const _docPages = useState<SdxPage[]>('sd.documentPages', () => [])
     const _docTreeMap = useState<SdxPageTreeElement[]>('sd.documentTreeMap', () => [])
 
     /**
@@ -32,8 +35,7 @@ export function useSlateDocument() {
     function getDocument() {
         return {
             config: _docConfig,
-            metadata: _docMetadata,
-            pages: _docPages
+            metadata: _docMetadata
         }
     }
 
@@ -55,9 +57,11 @@ export function useSlateDocument() {
             } else {
                 const data = await $sio.loadFile(selectedFile)
 
-                _docPages.value = data.pages
-                _docMetadata.value = data.metadata
-                _docConfig.value = data.config
+                _docMetadata.value = data?.metadata
+                _docConfig.value = data?.config
+                await $con.setBufferPath(data?.bufferDir)
+                await $con.setDbPath(data?.bufferDbDir)
+                await $con.loadAndMigrateDb()
             }
         } catch (e: any) {
             $qt.error('Error', e.message as string)
@@ -89,14 +93,14 @@ export function useSlateDocument() {
                 await $sio.saveSdxFile()
             } else {
                 // headless-editing saving
-                if(!editor)
-                    throw new Error('Unable to retrieve page content due to unpassed parameters')
-
-                const content =
-                    $sio.isMarkdownFile() ? unref(editor).storage.markdown.getMarkdown() :
-                    $sio.isTextFile() ? unref(editor).getText() : unref(editor).getText()
-
-                await $sio.saveNonSdxFile(content)
+                // if(!editor)
+                //     throw new Error('Unable to retrieve page content due to unpassed parameters')
+                //
+                // const content =
+                //     $sio.isMarkdownFile() ? unref(editor).storage.markdown.getMarkdown() :
+                //     $sio.isTextFile() ? unref(editor).getText() : unref(editor).getText()
+                //
+                // await $sio.saveNonSdxFile(content)
             }
         } catch(e: any) {
             $qt.error('Error', `An error occurred whilst trying to save your document: ${e.message}`)
@@ -221,49 +225,20 @@ export function useSlateDocument() {
      * @param pageUuids Array of page UUIDs to update
      * @param updates Array of partial page updates (matched by index to pageUuids)
      */
-    function setPages(pageUuids: PossiblyRef<string[]>, updates: PossiblyRef<Partial<SdxPage>[]>) {
-        const ids = unref(pageUuids);
-        const pageUpdates = unref(updates);
+    async function setPages(pageUuids: PossiblyRef<string[]>, updates: PossiblyRef<Partial<SdxPage>[]>) {
+        const data = unref(updates)
+        const uuids = unref(pageUuids)
 
-        if (ids.length !== pageUpdates.length) {
-            throw new Error("pageUuids and updates arrays must be the same length");
-        }
+        if (uuids.length != data.length)
+            throw new Error('Lengths of arrays to update does not match')
 
-        const currentPages = unref(_docPages);
-        const updatedPages = [...currentPages];
-        const pageIndexMap = new Map<string, number>();
-
-        updatedPages.forEach((page, index) => {
-            pageIndexMap.set(page.uuid, index);
-        });
-
-        let hasUpdates = false;
-
-        ids.forEach((uuid, i) => {
-            const pageIndex = pageIndexMap.get(uuid);
-            if (pageIndex !== undefined) {
-                const originalPage = updatedPages[pageIndex];
-                const updates = pageUpdates[i];
-
-                // Apply updates in a type-safe way
-                updatedPages[pageIndex] = {
-                    uuid: originalPage.uuid,
-                    content: updates?.content ?? originalPage.content,
-                    persistentData: updates?.persistentData ?? originalPage.persistentData,
-                    children: updates?.children ?? originalPage.children,
-                    name: updates?.name ?? originalPage.name,
-                    icon: updates?.icon ?? originalPage.icon,
-                    parentPageId: updates?.parentPageId ?? originalPage.parentPageId,
-                    reference_to: updates?.reference_to ?? originalPage.reference_to,
-                };
-
-                hasUpdates = true;
+        await $con.db().transaction(async (tx) => {
+            for (let i = 0; i < uuids.length; i++) {
+                await tx.update(pages)
+                    .set(data[i] & { modifiedAt: new Date() })
+                    .where(eq(pages.uuid, uuids[i]))
             }
-        });
-
-        if (hasUpdates) {
-            _docPages.value = updatedPages;
-        }
+        })
     }
 
     return {

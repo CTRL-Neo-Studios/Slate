@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
     app: {
         pageTransition: { name: 'page', mode: 'out-in' },
-        layoutTransition: { name: 'layout', mode: 'out-in' }
+        layoutTransition: { name: 'layout', mode: 'out-in' },
     },
     devtools: { enabled: false },
     // Enable SSG
@@ -22,13 +22,12 @@ export default defineNuxtConfig({
         },
         resolve: {
             alias: {
-                'html2canvas': 'html2canvas-pro'
-            }
-        }
+                'html2canvas': 'html2canvas-pro',
+            },
+        },
     },
 
-    modules: ['@nuxt/ui', // '@nuxt/eslint',
-    'nuxt-tiptap-editor', '@nuxtjs/mdc'],
+    modules: ['@nuxt/ui', 'nuxt-tiptap-editor', '@nuxtjs/mdc'],
     tiptap: {
         prefix: 'Tiptap', //prefix for Tiptap imports, composables not included
     },
@@ -43,7 +42,7 @@ export default defineNuxtConfig({
     fonts: {
         families: [
             { name: 'Inter' },
-            { name: 'Noto Sans Simplified Chinese' }
-        ]
-    }
+            { name: 'Noto Sans Simplified Chinese' },
+        ],
+    },
 })

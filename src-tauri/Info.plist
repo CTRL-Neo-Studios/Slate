@@ -21,5 +21,10 @@
             <string>YES</string>
         </dict>
     </array>
+
+    <key>CADisableMinimumFrameDurationOnPhone</key><true/>
+    <key>CADisplayLinkMinimumFramesPerSecond</key>
+    <integer>120</integer>
+    <key>CADisableMinimumFrameDuration</key><true/>
 </dict>
 </plist>

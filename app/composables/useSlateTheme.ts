@@ -11,7 +11,7 @@ export function useSlateTheme() {
         // Apply UI theme colors
         const themeColors = isDark ? preset.darkThemeColors : preset.lightThemeColors
         Object.entries(themeColors).forEach(([key, value]) => {
-            const cssVarName = `--ui-${key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
+            const cssVarName = `--${key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
             console.log(`replacing ${cssVarName} value`)
             root.style.setProperty(cssVarName, value)
         })

@@ -62,13 +62,13 @@ const $editor = useSlateEditor($slate.getCurrentSlatePage($pageId)?.content || '
 </script>
 
 <template>
-    <div class="w-full flex justify-center items-start min-h-screen">
+    <div class="w-full flex justify-center items-start min-h-screen font-prose">
         <div class="h-full sm:w-xl md:w-2xl w-3xl lg:w-4xl xl:w-5xl" ref="editableElement">
             <SlateEditorDragHandle :editor="$editor" v-if="$editor"/>
             <TiptapEditorContent :editor="$editor" v-if="$editor" class="max-w-none w-full h-full"/>
             <template v-if="showBottomBar">
-                <SlateEditorTextStylingToolbar :editor="$editor" v-if="$editor"/>
-                <SlateEditorViewsToolbar :editor="$editor" :pageId="$pageId" v-if="$editor"/>
+<!--                <SlateEditorTextStylingToolbar :editor="$editor" v-if="$editor"/>-->
+<!--                <SlateEditorViewsToolbar :editor="$editor" :pageId="$pageId" v-if="$editor"/>-->
             </template>
             <SlateEditorSearchReplaceTool :editor="$editor"/>
         </div>
@@ -79,10 +79,20 @@ const $editor = useSlateEditor($slate.getCurrentSlatePage($pageId)?.content || '
 @reference "~/assets/css/main.css";
 
 .tiptap {
-    @apply h-full min-h-max w-full max-w-none px-10 pt-16 pb-40 custom-prose;
+    @apply h-full min-h-max w-full max-w-none px-10 pt-16 pb-20 custom-prose;
 
     a {
         @apply cursor-pointer underline;
+    }
+
+    th {
+        .grip-column {
+            @apply bg-black;
+        }
+
+        .grip-row {
+            @apply bg-black;
+        }
     }
 }
 
@@ -152,10 +162,10 @@ div[contenteditable='true']:focus {
 .ProseMirror-selectednoderange {
     position: relative;
 
-    &::before {
+    &::after {
         position: absolute;
         pointer-events: none;
-        z-index: -1;
+        z-index: 1;
         content: '';
         top: -0.25rem;
         left: -0.25rem;

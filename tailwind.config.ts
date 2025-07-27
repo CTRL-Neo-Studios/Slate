@@ -39,7 +39,7 @@ module.exports = {
                         '--tw-prose-invert-pre-code': 'var(--color-flexoki-dark-tx)',
                         '--tw-prose-invert-pre-bg': 'rgba(0, 0, 0, 0.5)',
                         '--tw-prose-invert-th-borders': 'var(--color-flexoki-dark-ui-3)',
-                        '--tw-prose-invert-td-borders': 'var(--color-flexoki-dark-ui)'
+                        '--tw-prose-invert-td-borders': 'var(--color-flexoki-dark-ui)',
                     },
                 },
             }),

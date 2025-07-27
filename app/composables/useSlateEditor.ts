@@ -23,6 +23,8 @@ import { DragHandle } from '@tiptap-pro/extension-drag-handle-vue-3'
 import { NodeRange } from '@tiptap-pro/extension-node-range'
 import Highlight from '~/components/Slate/Editor/Prose/Highlight'
 import CodeBlockShiki from 'tiptap-extension-code-block-shiki'
+import { TaskList } from '@tiptap/extension-task-list'
+import { TaskItem } from '@tiptap/extension-task-item'
 
 export const useSlateEditor = (initialContent: string, editable: boolean, onUpdateCallback: any = null, ...extensions: any[]) => {
 
@@ -43,7 +45,10 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
             }),
             TiptapLink,
             Highlight,
-
+            TaskList,
+            TaskItem.configure({
+                nested: true,
+            }),
             Underline,
             CharacterCount,
             Table,
@@ -55,17 +60,6 @@ export const useSlateEditor = (initialContent: string, editable: boolean, onUpda
                 searchResultClass: "search-result",
                 disableRegex: false,
             }),
-            // GlobalDragHandle,
-            // DragHandle.configure({
-            //     render: () => {
-            //         const element = document.createElement('div')
-            //
-            //         // Use as a hook for CSS to insert an icon
-            //         element.classList.add('custom-drag-handle')
-            //
-            //         return element
-            //     },
-            // }),
             NodeRange.configure({
                 // allow to select only on depth 0
                 // depth: 0,

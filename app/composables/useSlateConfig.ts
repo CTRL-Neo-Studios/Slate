@@ -3,6 +3,7 @@ import { BaseDirectory, exists, readTextFile, writeFile, mkdir } from '@tauri-ap
 import type { SlateConfig, SlateDocumentConfig, SlateDocument, SlateMetadata } from '~/types/slate.types'
 import type { PossiblyRef } from '~/types/utility.types'
 import { SlateModalWarning } from '#components'
+import { useSlateTheme } from '~/composables/useSlateTheme'
 
 export const useSlateConfig = () => {
     const $o = useOverlay()
@@ -185,9 +186,7 @@ export const useSlateConfig = () => {
 
     function applyConfigEffects() {
         if (!isGlobalConfigLoaded()) return
-        useColorMode().preference = getGlobalConfig().defaultEditorTheme
-        useAppConfig().ui.colors.primary = getGlobalConfig().colorTheme
-        useAppConfig().ui.colors.neutral = getGlobalConfig().backgroundTheme
+        useSlateTheme().setToDefault()
     }
 
     return {

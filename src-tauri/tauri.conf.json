@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Slate",
   "version": "0.2.0",
-  "identifier": "dev.ctrl-neo",
+  "identifier": "dev.ctrl-neo.slate",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:3000",
@@ -27,7 +27,13 @@
           ],
           "radius": 10
         },
-        "dragDropEnabled": false
+        "transparent": false,
+        "dragDropEnabled": false,
+        "focus": true,
+        "trafficLightPosition": {
+          "x": 10,
+          "y": 15
+        }
       }
     ],
     "security": {

@@ -1,6 +1,5 @@
 import { open } from '@tauri-apps/plugin-dialog';
 import { readTextFile, readFile } from '@tauri-apps/plugin-fs';
-import type { Editor } from '@tiptap/vue-3'
 import { SlateModalWarning } from '#components'
 import {marked} from 'marked'
 import type { SlateDocument } from '~/types/slate.types'
@@ -110,7 +109,7 @@ export const useNoteImporter = () => {
 
         $slate.setSlateDocument(noteData as SlateDocument)
         if (routePage)
-            await navigateTo(`/document/${noteData.pages[0]?.uuid}`)
+            useSlateCommon().toPage(noteData.pages[0]?.uuid || '')
     }
 
     const readMarkdown = async (path: string) => {

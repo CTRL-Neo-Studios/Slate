@@ -1,5 +1,4 @@
 import { Menu, Submenu, MenuItem, PredefinedMenuItem, CheckMenuItem, IconMenuItem } from '@tauri-apps/api/menu'
-import type { Editor } from '@tiptap/vue-3'
 
 export const useAppMenu = () => {
     const $import = useNoteImporter()
@@ -56,7 +55,7 @@ export const useAppMenu = () => {
                 text: 'Settings...',
                 accelerator: 'CommandOrControl+,',
                 action: async () => {
-                    await $config.openConfig($route.fullPath)
+                    await $config.openConfig(useRoute().fullPath)
                 },
             })
 
@@ -97,8 +96,7 @@ export const useAppMenu = () => {
                 action: async () => {
                     console.log('Save File')
                     await $saver.saveNote()
-                },
-                enabled: isEditingDocument.value
+                }
             })
 
             // Uncomment and adjust these if you want to include export functionality

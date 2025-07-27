@@ -4,8 +4,9 @@
 @config "~~/tailwind.config.ts";
 
 @theme static{
-    --font-editor: 'Inter', 'Noto Sans Simplified Chinese', 'Geist', 'Outfit', 'Times New Roman';
-    --font-code: 'JetBrains Mono', 'Consolas';
+    --font-editor: 'Inter', 'Noto Sans Simplified Chinese', 'Geist', 'Outfit', 'Times New Roman'; /* The interface font */
+    --font-code: 'JetBrains Mono', 'Consolas'; /* The code font */
+    --font-prose: 'Geist', var(--font-sans), sans-serif; /* The prose font. */
 
     --font-sans: var(--font-editor, sans-serif), serif, system-ui, -apple-system,
     BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Apple Color Emoji,
@@ -132,7 +133,7 @@
 
 @utility custom-prose {
     h1 {
-        @apply scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl text-(--prose-headings);
+        @apply scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl text-(--prose-headings) ;
     }
     h2 {
         @apply scroll-m-20 border-b border-(--ui-border) pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 text-(--prose-headings);

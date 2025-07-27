@@ -37,6 +37,8 @@
 </template>
 
 <style>
+@reference "~/assets/css/main.css";
+
 .page-enter-active,
 .page-leave-active {
     transition: all 0.3s;
