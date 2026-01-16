@@ -1,4 +1,8 @@
 # Slate
+
+> ![WARN]
+> This project is deprecated. Please go check out our new Markdown Editor, [Vertex](https://github.com/CTRL-Neo-Studios/vertex).
+
 Slate is a WYSIWYG Text Editing Software with a simplistic touch to it.
 
 ## Issues in Dev
