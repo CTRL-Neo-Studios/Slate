@@ -1,6 +1,6 @@
 # Slate
 
-> [!WARN]
+> [!WARNING]
 > 
 > This project is deprecated. Please go check out our new Markdown Editor, [Vertex](https://github.com/CTRL-Neo-Studios/vertex).
 
